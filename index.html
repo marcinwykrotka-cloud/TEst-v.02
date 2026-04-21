@@ -15,21 +15,17 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream); color: #222; min-height: 100vh; }
-
 .app { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
-.screen { display: block; }
 .hdr { background: var(--plum); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 5px; position: relative; overflow: hidden; }
 .hdr::after { content:''; position:absolute; right:-30px; top:-30px; width:140px; height:140px; border-radius:50%; background:var(--violet); opacity:.3; }
 .hdr .brand { font-size: 9px; letter-spacing: 3px; color: var(--lav); text-transform: uppercase; margin-bottom: 5px; }
 .hdr h1 { font-size: 22px; font-family: Georgia, serif; color: var(--wgold); position: relative; z-index: 1; }
 .hdr .sub { font-size: 12px; color: var(--lav); margin-top: 4px; }
 .gold-bar { height: 4px; background: var(--gold); border-radius: 0 0 4px 4px; margin-bottom: 18px; }
-
 .prog-wrap { margin-bottom: 18px; }
 .prog-bar { height: 7px; background: #e0d8f0; border-radius: 6px; overflow: hidden; }
 .prog-fill { height: 100%; background: linear-gradient(90deg, var(--violet), var(--gold)); border-radius: 6px; transition: width .35s; width: 0%; }
 .prog-label { font-size: 11px; color: var(--gray); margin-top: 5px; }
-
 .q-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px 18px; margin-bottom: 14px; border-top: 3px solid var(--violet); }
 .q-sec { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); font-weight: 700; margin-bottom: 3px; }
 .q-num { font-size: 10px; letter-spacing: 1px; color: var(--lav); font-weight: 700; margin-bottom: 7px; text-transform: uppercase; }
@@ -37,20 +33,17 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 .opts { display: flex; flex-direction: column; gap: 8px; }
 .opt { display: flex; align-items: flex-start; gap: 11px; padding: 10px 13px; border: 1.5px solid #e0d8f0; border-radius: 8px; cursor: pointer; background: var(--cream); }
 .opt.sel { border-color: var(--violet); background: #ede7f6; }
-.opt input[type=radio] { accent-color: var(--violet); }
+.opt input[type=radio] { accent-color: var(--violet); cursor: pointer; }
 .opt label { cursor: pointer; font-size: 13px; line-height: 1.45; color: #333; }
-
 .btn { display: inline-block; padding: 13px 32px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; background: var(--violet); color: #fff; width: 100%; }
 .center { text-align: center; margin-top: 22px; }
 .submit-msg { font-size: 12px; text-align: center; margin-top: 10px; color: var(--ok); }
-
-/* WYNIKI INDYWIDUALNE - STYL ORYGINALNY */
-.res-box { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-top: 22px; text-align: left;}
+.res-box { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-top: 22px; text-align: left; }
 .res-head { background: var(--plum); padding: 22px 26px; }
 .res-title { font-size: 20px; font-family: Georgia, serif; color: var(--wgold); }
 .res-sub { font-size: 12px; color: var(--lav); margin-top: 4px; }
 .res-body { padding: 22px 26px; }
-.score-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
+.score-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 18px; }
 .sc { text-align: center; padding: 13px 6px; border-radius: 8px; }
 .sc .lbl { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
 .sc .val { font-size: 30px; font-family: Georgia, serif; font-weight: 700; }
@@ -61,31 +54,28 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 .ph3 { font-size: 13px; font-weight: 700; color: var(--plum); margin-bottom: 9px; border-bottom: 2px solid var(--lightpur); }
 .myth-item { background: #fdf3d7; border-left: 3px solid var(--gold); padding: 9px 12px; margin-bottom: 8px; font-size: 12px; }
 .tip-item { background: var(--lightpur); border-left: 3px solid var(--violet); padding: 9px 12px; margin-bottom: 8px; font-size: 12px; }
-.divider { border: none; border-top: 1px solid #e0d8f0; margin: 16px 0; }
-.cta-box { background: var(--plum); padding: 18px 22px; border-radius: 9px; text-align: center; color: white; }
+.cta-box { background: var(--plum); padding: 18px 22px; border-radius: 9px; text-align: center; color: white; margin-top: 20px; }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="hdr">
-    <div class="brand">VIA Multiplier &middot; Szkolenia i Coaching</div>
-    <h1>Pokoleniowy Kompas HR</h1>
-    <div class="sub">Test diagnostyczny &middot; 15 pytań &middot; ok. 7 minut</div>
+<div class="app" id="app-container">
+  <div id="quiz-view">
+    <div class="hdr">
+      <div class="brand">VIA Multiplier &middot; Szkolenia i Coaching</div>
+      <h1>Pokoleniowy Kompas HR</h1>
+      <div class="sub">Test diagnostyczny &middot; 15 pytań &middot; ok. 7 minut</div>
+    </div>
+    <div class="gold-bar"></div>
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+      <div class="prog-label" id="prog-label">Odpowiedziano: 0 z 15</div>
+    </div>
+    <div id="q-container"></div>
+    <div class="center" id="submit-area">
+      <button class="btn" onclick="submitTest()">Zobacz moje wyniki &rarr;</button>
+      <div class="submit-msg" id="submit-msg"></div>
+    </div>
   </div>
-  <div class="gold-bar"></div>
-
-  <div class="prog-wrap">
-    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
-    <div class="prog-label" id="prog-label">Odpowiedziano: 0 z 15</div>
-  </div>
-
-  <div id="q-container"></div>
-
-  <div class="center" id="submit-area">
-    <button class="btn" onclick="submitTest()">Zobacz moje wyniki &rarr;</button>
-    <div class="submit-msg" id="submit-msg"></div>
-  </div>
-
   <div id="ind-results"></div>
 </div>
 
@@ -93,14 +83,12 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
 <script>
-// --- KONFIGURACJA ---
 const firebaseConfig = { 
-    databaseURL: "https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app/" 
+    databaseURL: "https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app" 
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// DOKŁADNA TREŚĆ PYTAŃ Z TWOJEGO KODU
 var QS = [
   {sec:"Sekcja 1: Przekonania i mity", txt:"Kiedy Z-etka pyta po tygodniu pracy o awans, myślę przede wszystkim:", opts:[
     {t:"Jest roszczeniowa – nie znają wartości cierpliwości",w:{BB:2,X:2,Y:0,Z:0},myth:true},
@@ -235,13 +223,10 @@ function calcScores(ans) {
 async function submitTest() {
   if (answers.includes(null)) { alert("Proszę odpowiedzieć na wszystkie pytania!"); return; }
   var res = calcScores(answers);
-  document.getElementById('submit-area').style.display = 'none';
-
-  // WYSYŁKA DO FIREBASE
+  document.getElementById('quiz-view').style.display = 'none';
   try {
     await db.ref('wyniki').push({ flex: res.flex, myths: res.myths, BB: res.sc.BB, X: res.sc.X, Y: res.sc.Y, Z: res.sc.Z, ts: Date.now(), profile: res.profile });
-  } catch(e) { console.log("Błąd bazy, ale pokazuję wynik."); }
-
+  } catch(e) { console.log("Błąd bazy danych."); }
   renderIndividual(res);
 }
 
@@ -255,19 +240,15 @@ function renderIndividual(res) {
   };
   var p = PT[res.profile];
   var flexBg = res.flex >= 65 ? '#1a6040' : res.flex >= 40 ? '#c27700' : '#8B0000';
-
   var mythsHtml = '';
   answers.forEach(function(ai, qi) { if (QS[qi].opts[ai].myth) mythsHtml += '<div class="myth-item">⚠ ' + QS[qi].opts[ai].t + '</div>'; });
   if (!mythsHtml) mythsHtml = '<div class="tip-item">✓ Brak aktywnych stereotypów!</div>';
-
   var genCells = ['BB','X','Y','Z'].map(function(g) {
     return '<div class="gc" style="background:' + GC[g] + '22;border:1.5px solid ' + GC[g] + '"><div class="gl" style="color:' + GC[g] + '">' + GN[g] + '</div><div class="gv" style="color:' + GC[g] + '">' + res.sc[g] + '</div></div>';
   }).join('');
-
-  document.getElementById('ind-results').innerHTML = '<div class="res-box"><div class="res-head"><div class="res-title">' + p.icon + ' ' + p.full + '</div><div class="res-sub">Twój indywidualny wynik</div></div><div class="res-body"><p style="font-size:13px;line-height:1.6;margin-bottom:18px;">' + p.desc + '</p><div class="score-grid"><div class="sc" style="background:'+flexBg+'22;border:1.5px solid '+flexBg+'"><div class="lbl" style="color:'+flexBg+'">Elastyczność</div><div class="val" style="color:'+flexBg+'">'+res.flex+'%</div></div><div class="sc" style="background:#FDF3D7;border:1.5px solid #D4A843"><div class="lbl" style="color:#c27700">Świadomość</div><div class="val" style="color:#D4A843">'+res.awareness+'%</div></div></div><div class="gen-grid">' + genCells + '</div><hr class="divider"><div class="ph3">Zidentyfikowane stereotypy</div>' + mythsHtml + '<hr class="divider"><div class="cta-box"><div class="ct">VIA Multiplier &middot; Szkolenia</div></div></div></div>';
+  document.getElementById('ind-results').innerHTML = '<div class="res-box"><div class="res-head"><div class="res-title">' + p.icon + ' ' + p.full + '</div><div class="res-sub">Twój indywidualny wynik</div></div><div class="res-body"><p style="font-size:13px;line-height:1.6;margin-bottom:18px;">' + p.desc + '</p><div class="score-grid"><div class="sc" style="background:'+flexBg+'22;border:1.5px solid '+flexBg+'"><div class="lbl" style="color:'+flexBg+'">Elastyczność</div><div class="val" style="color:'+flexBg+'">'+res.flex+'%</div></div><div class="sc" style="background:#FDF3D7;border:1.5px solid #D4A843"><div class="lbl" style="color:#c27700">Świadomość</div><div class="val" style="color:#D4A843">'+res.awareness+'%</div></div></div><div class="gen-grid">' + genCells + '</div><hr class="divider"><div class="ph3">Zidentyfikowane stereotypy</div>' + mythsHtml + '<hr class="divider"><div class="cta-box">VIA Multiplier &middot; Szkolenia i Coaching</div></div></div>';
   window.scrollTo(0,0);
 }
-
 buildQuestions();
 </script>
 </body>
