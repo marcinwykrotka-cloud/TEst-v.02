@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="pl"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Pokoleniowy Kompas HR – Test&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>:root { --plum: #2D1B4E; --violet: #5B2D8E; --lav: #9B72CF; --gold: #D4A843; --wgold: #F0C060; --cream: #FAF7F2; --white: #ffffff; --radius: 10px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: 'Segoe UI', sans-serif; background: var(--cream); color: #222; padding: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.app { max-width: 720px; margin: 0 auto; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.hdr { background: var(--plum); border-radius: var(--radius); padding: 20px; color: white; text-align: center; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.hdr h1 { color: var(--wgold); font-family: Georgia, serif; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.q-card { background: var(--white); border-radius: var(--radius); padding: 20px; margin: 15px 0; border-top: 4px solid var(--violet); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.opt { display: block; padding: 10px; border: 1px solid #ddd; margin: 5px 0; border-radius: 8px; cursor: pointer; transition: 0.2s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.opt:hover { background: #f0ebfb; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.opt.sel { border-color: var(--violet); background: #ede7f6; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.btn { background: var(--violet); color: white; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.prog-bar { height: 8px; background: #ddd; border-radius: 4px; margin: 10px 0; overflow: hidden; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.prog-fill { height: 100%; background: var(--gold); width: 0%; transition: 0.3s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>#res-msg { text-align: center; margin-top: 20px; font-weight: bold; color: var(--violet); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1">&lt;div class="app"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="hdr"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1&gt;Pokoleniowy Kompas HR&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Test diagnostyczny dla uczestników webinaru&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="prog-bar"&gt;&lt;div class="prog-fill" id="prog-fill"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p id="prog-label" style="font-size: 12px; color: #666;"&gt;Postęp: 0/15&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="q-container"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="btn" onclick="submitTest()"&gt;Zakończ test i wyślij wynik&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="res-msg"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// KONFIGURACJA - TU WKLEJ SWÓJ URL</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const firebaseConfig = { databaseURL: https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app/};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>firebase.initializeApp(firebaseConfig);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const db = firebase.database();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Baza pytań (Twoje oryginalne)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const QS = [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Kiedy Z-etka pyta po tygodniu pracy o awans, myślę przede wszystkim:", opts:[{t:"Jest roszczeniowa",w:{BB:2,X:2,Y:0,Z:0},m:true},{t:"Potrzebuje sensu",w:{BB:0,X:0,Y:2,Z:2},m:false},{t:"Nie pasuje do kultury",w:{BB:1,X:1,Y:0,Z:0},m:true},{t:"To okazja do rozmowy",w:{BB:0,X:0,Y:1,Z:2},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Baby Boomer nie używa Slacka i preferuje telefon. Reaguję:", opts:[{t:"Dostosowuję się",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"Musi się nauczyć",w:{BB:0,X:0,Y:1,Z:2},m:true},{t:"Rozumiem kontekst",w:{BB:2,X:2,Y:0,Z:0},m:false},{t:"Ogranicza zespół",w:{BB:0,X:0,Y:1,Z:1},m:true}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Millennial chce work-life balance i nie chce nadgodzin:", opts:[{t:"Brak lojalności",w:{BB:2,X:1,Y:0,Z:0},m:true},{t:"Sygnał wypalenia",w:{BB:0,X:1,Y:2,Z:1},m:false},{t:"Uzasadniona potrzeba",w:{BB:0,X:1,Y:2,Z:2},m:false},{t:"Tacy po prostu są",w:{BB:1,X:0,Y:0,Z:0},m:true}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Pokolenie X nie angażuje się w integrację:", opts:[{t:"Są zamknięci",w:{BB:0,X:0,Y:1,Z:1},m:true},{t:"Złe inicjatywy",w:{BB:1,X:2,Y:1,Z:0},m:false},{t:"Zbyt dużo pracy",w:{BB:1,X:2,Y:0,Z:0},m:false},{t:"Powinienem zapytać",w:{BB:0,X:1,Y:2,Z:1},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"'Z każdym pokoleniem trzeba rozmawiać inaczej':", opts:[{t:"Przesada",w:{BB:0,X:0,Y:1,Z:0},m:true},{t:"Tak, inne wartości",w:{BB:1,X:1,Y:2,Z:2},m:false},{t:"Zgadzam się w 100%",w:{BB:1,X:1,Y:2,Z:2},m:false},{t:"Polityczna poprawność",w:{BB:0,X:0,Y:0,Z:0},m:true}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Mail od Z-etki: 'Nie widzę sensu w tym projekcie':", opts:[{t:"Irytacja",w:{BB:1,X:0,Y:0,Z:0},m:false},{t:"Ciekawość",w:{BB:0,X:1,Y:2,Z:2},m:false},{t:"Niepokój",w:{BB:0,X:1,Y:1,Z:0},m:false},{t:"Satysfakcja",w:{BB:0,X:0,Y:2,Z:2},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Baby Boomer przerywa na spotkaniu:", opts:[{t:"Niecierpliwość",w:{BB:0,X:0,Y:1,Z:2},m:false},{t:"Szacunek",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"Chęć skrócenia",w:{BB:0,X:0,Y:1,Z:2},m:false},{t:"Aktywne słuchanie",w:{BB:1,X:1,Y:1,Z:1},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Zanim wyślesz komunikat do zespołu:", opts:[{t:"Czy jest jasny?",w:{BB:1,X:2,Y:1,Z:1},m:false},{t:"Jak go odbiorą?",w:{BB:1,X:1,Y:2,Z:2},m:false},{t:"Po prostu wysyłam",w:{BB:0,X:0,Y:0,Z:0},m:false},{t:"Uwzględniam styl?",w:{BB:1,X:1,Y:2,Z:2},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Twój komunikat wywołał złość:", opts:[{t:"Tłumaczę się",w:{BB:1,X:1,Y:0,Z:0},m:false},{t:"Pytam o przyczynę",w:{BB:0,X:1,Y:2,Z:2},m:false},{t:"Przepraszam",w:{BB:0,X:0,Y:2,Z:1},m:false},{t:"Analizuję na przyszłość",w:{BB:0,X:1,Y:2,Z:2},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Reakcja automatyczna:", opts:[{t:"Znam i rozpoznaję",w:{BB:0,X:1,Y:2,Z:2},m:false},{t:"Słyszałem, nie stosuję",w:{BB:1,X:1,Y:1,Z:0},m:false},{t:"Psychologiczny jargon",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"Pracuję nad tym",w:{BB:0,X:1,Y:2,Z:2},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Rekrutacja Gen Z - badanie motywacji:", opts:[{t:"Dlaczego my?",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"Co to sensowna praca?",w:{BB:0,X:1,Y:2,Z:2},m:false},{t:"Gdzie za 5 lat?",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"Co daje rano energię?",w:{BB:0,X:1,Y:2,Z:2},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Feedback dla Baby Boomera (delegowanie):", opts:[{t:"Bezpośrednio",w:{BB:2,X:2,Y:1,Z:0},m:false},{t:"Podkreślam autorytet",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"Pytam o samoocenę",w:{BB:1,X:2,Y:2,Z:1},m:false},{t:"Wskazuję status",w:{BB:2,X:1,Y:0,Z:0},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Onboarding Millennialsa:", opts:[{t:"Procedury",w:{BB:2,X:2,Y:0,Z:0},m:false},{t:"Buddy + jasny cel",w:{BB:0,X:1,Y:2,Z:2},m:false},{t:"Wrzucenie na głęboką wodę",w:{BB:0,X:0,Y:1,Z:2},m:false},{t:"Rozmowa o wartościach",w:{BB:0,X:0,Y:2,Z:2},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Napięcie: X chce telco, Z chce chat:", opts:[{t:"Jedno narzędzie dla wszystkich",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"Rozmowa o potrzebach",w:{BB:0,X:1,Y:2,Z:2},m:false},{t:"Temat decyduje",w:{BB:1,X:2,Y:2,Z:1},m:false},{t:"Sami ustalcie",w:{BB:0,X:1,Y:1,Z:1},m:false}]},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{txt:"Szkolenie wielopokoleniowe:", opts:[{t:"Jeden format",w:{BB:2,X:1,Y:0,Z:0},m:false},{t:"On-demand",w:{BB:0,X:1,Y:1,Z:2},m:false},{t:"Mix formatów",w:{BB:1,X:2,Y:2,Z:2},m:false},{t:"Warsztaty praktyczne",w:{BB:1,X:2,Y:2,Z:1},m:false}]}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let answers = new Array(15).fill(null);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function render() {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let h = '';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>QS.forEach((q, qi) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>h += `&lt;div class="q-card"&gt;&lt;p&gt;&lt;strong&gt;${qi+1}. ${q.txt}&lt;/strong&gt;&lt;/p&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>q.opts.forEach((o, oi) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>h += `&lt;div class="opt ${answers[qi]===oi?'sel':''}" onclick="pick(${qi},${oi})"&gt;${o.t}&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>h += `&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('q-container').innerHTML = h;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.pick = (qi, oi) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>answers[qi] = oi;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let done = answers.filter(a =&gt; a !== null).length;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('prog-fill').style.width = (done/15*100)+'%';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('prog-label').innerText = `Postęp: ${done}/15`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>render();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.submitTest = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(answers.includes(null)) { alert("Odpowiedz na wszystkie pytania!"); return; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let sc = {BB:0, X:0, Y:0, Z:0}; let myths = 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>answers.forEach((ai, qi) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let o = QS[qi].opts[ai];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>sc.BB+=o.w.BB; sc.X+=o.w.X; sc.Y+=o.w.Y; sc.Z+=o.w.Z;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(o.m) myths++;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let flex = Math.min(100, Math.round((sc.BB+sc.X+sc.Y+sc.Z)/30*100));</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>await db.ref('wyniki').push({ flex, myths, BB:sc.BB, X:sc.X, Y:sc.Y, Z:sc.Z, ts: Date.now() });</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('res-msg').innerText = "✓ Wynik wysłany pomyślnie! Dziękujemy.";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.scrollTo(0,0);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch(e) { alert("Błąd zapisu. Sprawdź połączenie."); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>render();</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
