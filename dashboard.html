@@ -4,58 +4,97 @@
 <meta charset="UTF-8">
 <title>Dashboard Grupy – LIVE</title>
 <style>
-:root { --plum: #2D1B4E; --violet: #5B2D8E; --gold: #D4A843; --cream: #FAF7F2; --white: #ffffff; }
-body { font-family: sans-serif; background: var(--cream); padding: 20px; color: #222; }
-.dash-card { background: var(--white); border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); padding: 25px; max-width: 800px; margin: 0 auto 20px; }
-.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-.stat { text-align: center; padding: 20px; border: 1.5px solid #e0d8f0; border-radius: 10px; }
+:root { --plum: #2D1B4E; --violet: #5B2D8E; --gold: #D4A843; --cream: #FAF7F2; --white: #ffffff; --teal: #1a5a7a; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--cream); padding: 20px; color: #222; }
+.dash-card { background: var(--white); border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 30px; max-width: 850px; margin: 0 auto 20px; }
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 35px; }
+.stat { text-align: center; padding: 20px; border: 1.5px solid #e0d8f0; border-radius: 10px; background: #fff; }
 .stat .val { font-size: 36px; font-weight: bold; color: var(--plum); }
-.stat .lbl { font-size: 10px; text-transform: uppercase; color: #666; }
-.bar-row { margin-bottom: 15px; text-align: left; }
-.bar-wrap { background: #f0ebfb; height: 25px; border-radius: 5px; overflow: hidden; position: relative; }
-.bar-fill { height: 100%; background: var(--violet); transition: width 0.8s; }
-.bar-lbl { font-size: 12px; margin-bottom: 5px; font-weight: bold; }
-.btn-danger { background: #c0392b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 20px; font-weight: bold; }
+.stat .lbl { font-size: 10px; text-transform: uppercase; color: #666; letter-spacing: 1px; margin-top: 5px; }
+
+/* Styl wykresów z Twojego zrzutu ekranu */
+.bar-row { margin-bottom: 25px; text-align: left; }
+.bar-lbl { font-size: 16px; margin-bottom: 8px; font-weight: bold; color: #000; }
+.bar-wrap { background: transparent; height: 35px; border-radius: 0; overflow: hidden; position: relative; width: 100%; }
+.bar-fill { height: 100%; background: var(--teal); border: 1px solid #000; transition: width 0.8s ease-out; width: 0%; }
+
+.btn-danger { background: #c0392b; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 30px; font-weight: bold; }
+#status { font-size: 11px; color: green; margin-bottom: 20px; font-weight: bold; }
 </style>
 </head>
 <body>
     <div class="dash-card">
-        <h2 style="font-family: Georgia; color: var(--plum); margin-bottom: 10px;">Pokoleniowy Kompas HR – Wyniki Grupy</h2>
-        <div id="status" style="font-size: 11px; color: green; margin-bottom: 20px;">Łączenie z bazą...</div>
+        <h1 style="font-family: Georgia, serif; color: var(--plum); margin-bottom: 5px;">Pokoleniowy Kompas HR</h1>
+        <p style="color: #666; margin-bottom: 25px;">Wyniki grupy w czasie rzeczywistym</p>
+        
+        <div id="status">Łączenie z bazą danych...</div>
+        
         <div class="stat-row">
             <div class="stat"><div class="lbl">Uczestników</div><div class="val" id="count">0</div></div>
             <div class="stat"><div class="lbl">Śr. Elastyczność</div><div class="val" id="avg-flex">0%</div></div>
             <div class="stat"><div class="lbl">Śr. Stereotypów</div><div class="val" id="avg-myths">0</div></div>
         </div>
+
         <div id="gen-stats"></div>
-        <button class="btn-danger" onclick="clearResults()">Wyczyść wszystkie wyniki</button>
+        
+        <button class="btn-danger" onclick="clearResults()">Wyczyść wyniki sesji</button>
     </div>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = { databaseURL: "https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
 db.ref('wyniki').on('value', (snapshot) => {
     const data = snapshot.val();
-    if (!data) { document.getElementById('count').innerText = 0; return; }
+    if (!data) {
+        document.getElementById('count').innerText = 0;
+        document.getElementById('gen-stats').innerHTML = "<p style='color: #999'>Czekam na pierwsze wyniki...</p>";
+        return;
+    }
     const arr = Object.values(data);
     const n = arr.length;
+    
     document.getElementById('count').innerText = n;
     document.getElementById('avg-flex').innerText = Math.round(arr.reduce((s,r)=>s+r.flex,0)/n) + '%';
     document.getElementById('avg-myths').innerText = (arr.reduce((s,r)=>s+r.myths,0)/n).toFixed(1);
-    document.getElementById('status').innerText = "✓ Połączenie aktywne | " + new Date().toLocaleTimeString();
+    document.getElementById('status').innerText = "✓ LIVE | Ostatnia aktualizacja: " + new Date().toLocaleTimeString();
+
     let genHtml = '';
-    const gens = [{k:'BB', n:'Baby Boomers'}, {k:'X', n:'Gen X'}, {k:'Y', n:'Millenialsi'}, {k:'Z', n:'Gen Z'}];
+    const gens = [
+        {k:'BB', n:'Baby Boomers'}, 
+        {k:'X', n:'Gen X'}, 
+        {k:'Y', n:'Millenialsi'}, 
+        {k:'Z', n:'Gen Z'}
+    ];
+
+    // Maksymalna możliwa liczba punktów dla jednej kategorii to ok. 20-25 w Twoim teście
+    // Ustawiamy dzielnik na 20, aby paski były długie i czytelne jak na skrinie
+    const maxScale = 20; 
+
     gens.forEach(g => {
         const avg = (arr.reduce((s,r)=>s+r[g.k],0)/n).toFixed(1);
-        const pct = (avg / 7.5) * 100;
-        genHtml += `<div class="bar-row"><div class="bar-lbl">${g.n} (${avg} pkt)</div><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div></div>`;
+        let pct = (avg / maxScale) * 100;
+        if (pct > 100) pct = 100; // Zabezpieczenie przed wyjściem paska poza ekran
+
+        genHtml += `
+            <div class="bar-row">
+                <div class="bar-lbl">${g.n} (${avg} pkt)</div>
+                <div class="bar-wrap">
+                    <div class="bar-fill" style="width:${pct}%"></div>
+                </div>
+            </div>`;
     });
     document.getElementById('gen-stats').innerHTML = genHtml;
 });
+
 async function clearResults() {
-    if (confirm("Usunąć wszystkie dane?")) { await db.ref('wyniki').remove(); location.reload(); }
+    if (confirm("Czy na pewno chcesz usunąć wszystkie wyniki z tej sesji?")) {
+        await db.ref('wyniki').remove();
+        location.reload();
+    }
 }
 </script>
 </body>
