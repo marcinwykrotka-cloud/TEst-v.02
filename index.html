@@ -207,16 +207,22 @@ function pickAnswer(qi, oi) {
 }
 
 function calcScores(ans) {
-  var sc = {BB:0, X:0, Y:0, Z:0}; var myths = 0;
+  var sc = {BB:0, X:0, Y:0, Z:0}; 
+  var myths = 0;
   ans.forEach(function(ai, qi) {
     var opt = QS[qi].opts[ai];
     sc.BB += opt.w.BB; sc.X += opt.w.X; sc.Y += opt.w.Y; sc.Z += opt.w.Z;
     if (opt.myth) myths++;
   });
+  
   var total = sc.BB + sc.X + sc.Y + sc.Z;
-  var flex = Math.min(100, Math.round(total / 30 * 100));
+  // ZMIANA: Dzielnik 75 zamiast 30 sprawia, że 100% jest realnym wyzwaniem
+  var flex = Math.min(100, Math.round(total / 75 * 100));
   var awareness = Math.max(0, 100 - myths * 15);
-  var profile = flex >= 65 ? 'Ambasador' : flex >= 40 ? 'Mediator' : 'Odkrywca';
+  
+  // Progi dla profili:
+  var profile = flex >= 75 ? 'Ambasador' : flex >= 45 ? 'Mediator' : 'Odkrywca';
+  
   return { sc:sc, flex:flex, myths:myths, awareness:awareness, profile:profile };
 }
 
