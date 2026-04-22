@@ -16,10 +16,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream); color: #222; min-height: 100vh; }
-
 .app { max-width: 750px; margin: 0 auto; padding: 20px 16px 60px; }
 
-/* Nagłówek Brandingowy tylko do PDF */
 .pdf-branding { display: none; text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 25px; }
 .pdf-branding h2 { color: var(--violet); font-size: 16px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
 
@@ -45,9 +43,10 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 .sc { text-align: center; padding: 15px; border-radius: 8px; border: 2px solid; }
 .sc .val { font-size: 32px; font-family: Georgia, serif; font-weight: bold; }
 
-.ph3 { font-size: 15px; font-weight: 700; color: var(--plum); margin: 20px 0 10px; border-bottom: 2px solid var(--gold); padding-bottom: 5px; }
+.ph3 { font-size: 15px; font-weight: 700; color: var(--plum); margin: 25px 0 10px; border-bottom: 2px solid var(--gold); padding-bottom: 5px; }
 .tip-box { background: var(--lightpur); border-left: 5px solid var(--violet); padding: 15px; margin-bottom: 15px; border-radius: 0 8px 8px 0; }
 .tip-box p { font-size: 13.5px; line-height: 1.6; color: #333; margin-bottom: 8px; }
+.tip-rel { font-size: 11px; text-transform: uppercase; color: var(--violet); font-weight: bold; display: block; margin-bottom: 5px; }
 .tip-example { font-style: italic; color: #444; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 4px; display: block; margin-top: 8px; border-left: 3px solid var(--gold); font-size: 13px; }
 
 .synergy-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
@@ -73,11 +72,11 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 
     <div class="intro-box">
       <h3>Jak korzystać z testu?</h3>
-      <p>Odpowiedz szczerze – nie ma złych ani dobrych odpowiedzi. Test mierzy Twoje <strong>naturalne strategie</strong> i <strong>przekonania</strong> w kontakcie z różnymi pokoleniami. Na końcu otrzymasz unikalny raport z praktycznymi scenariuszami.</p>
+      <p>Odpowiedz szczerze – nie ma złych ani dobrych odpowiedzi. Test mierzy Twoje <strong>naturalne strategie</strong> i <strong>przekonania</strong> w kontakcie z różnymi pokoleniami.</p>
     </div>
 
     <div id="q-container"></div>
-    <button class="btn" id="submit-btn" onclick="submitTest()">Generuj mój profil i wskazówki &rarr;</button>
+    <button class="btn" id="submit-btn" onclick="submitTest()">Generuj raport i wskazówki &rarr;</button>
   </div>
   
   <div id="ind-results"></div>
@@ -91,120 +90,127 @@ const firebaseConfig = { databaseURL: "https://kompas-hr-default-rtdb.europe-wes
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// BANK PRZYKŁADÓW (Dla Marcina: Tutaj możesz dopisywać nowe!)
 const TIPS_BANK = {
   Z: [
-    { wyzwanie: "Roszczeniowość vs Głód wpływu", przyklad: "Zamiast: 'Nie od razu, poczekaj na swoją kolej', powiedz: 'Doceniam Twoje zaangażowanie. Jakie 2 kompetencje chcesz rozwinąć w tym kwartale, by przygotować się do poważniejszych zadań?'" },
-    { wyzwanie: "Feedback pętlowy", przyklad: "Zetki potrzebują wiedzieć 'jak mi idzie' częściej niż raz na kwartał. Spróbuj: 'Dobra robota z tym raportem, szczególnie te wykresy. Następnym razem pamietaj o krótkim wstępie i podsumowaniu na koniec.'." },
-    { wyzwanie: "Praca zdalna vs Relacje", przyklad: "Zamiast narzucać biuro, zapytaj: 'Jakiej formy kontaktu potrzebujesz, by czuć wsparcie zespołu, pracując z domu?'" }
+    { rel: "Lider do pracownika Gen Z", wyzwanie: "Roszczeniowość vs Potrzeba sensu", przyklad: "Zamiast: 'Zrób to, bo tak trzeba', powiedz: 'Ten projekt pomoże nam zredukować błędy o 15%, co ułatwi pracę całemu zespołowi. Twoja rola w tym jest kluczowa'." },
+    { rel: "Współpracownik do Gen Z", wyzwanie: "Brak cierpliwości w awansie", przyklad: "Powiedz: 'Twoje ambicje są super. Chodź, rozpiszemy plan na ten kwartał, żebyś za 3 miesiące miał twarde dowody na swoją wartość przy rozmowie o nowym stanowisku'." },
+    { rel: "Starszy stażem do Gen Z", wyzwanie: "Komunikacja cyfrowa", przyklad: "Jeśli Z-etka pisze na Slacku zamiast dzwonić, nie ignoruj tego. Odpisz: 'Jasne, widzę wiadomość. Daj mi 10 min, dokończę analizę i odpiszę Ci tutaj punkt po punkcie'." },
+    { rel: "HR do kandydata Gen Z", wyzwanie: "Wartości firmy", przyklad: "Zamiast o owocowych czwartkach, powiedz: 'Stawiamy na autentyczność. Jeśli popełnisz błąd, nie szukamy winnych, tylko wspólnie wyciągamy wnioski'." },
+    { rel: "Menedżer do Gen Z", wyzwanie: "Feedback pętlowy", przyklad: "Nie czekaj na ocenę roczną. Spróbuj: 'Dzięki za tę grafikę. Te kolory świetnie oddają dynamikę. Następnym razem zadbaj, by wokół logo była wymagana przestrzeń'." }
   ],
   BB: [
-    { wyzwanie: "Relacja przed zadaniem", przyklad: "Zanim przejdziesz do liczb, poświęć 2 minuty na small-talk. Powiedz: 'Dzień dobry, jak minął weekend? Słyszałam, że jest Pan zapalnoym ogrodnikiem...!'" },
-    { wyzwanie: "Szacunek dla doświadczenia", przyklad: "Zamiast narzucać nową aplikację, powiedz: 'Pańska wiedza o tym kliencie jest bezcenna. Chcę wdrożyć to narzędzie, by pomogło nam szybciej wyciągać te dane, które Pan od lat analizuje'." },
-    { wyzwanie: "Komunikacja bezpośrednia", przyklad: "Jeśli sprawa jest pilna, nie pisz maila. Podejdź lub zadzwoń. Boomerzy cenią 'głos' bardziej niż 'tekst'." }
-  ],
-  Y: [
-    { wyzwanie: "Zarządzanie przez sens (Purpose)", przyklad: "Zamiast: 'Zrób to na jutro', powiedz: 'Ten projekt pomoże nam zredukować błędy o 20%, co przełoży się na mniejszy stres w zespole. Twoja część jest kluczowa'." },
-    { wyzwanie: "Elastyczność jako waluta", przyklad: "Gdy proszą o wyjście wcześniej, powiedz: 'Jasne, ufam Ci. Ustalmy tylko, kiedy dowieziesz tę prezentację, by reszta zespołu mogła ruszyć dalej'." },
-    { wyzwanie: "Rozwój przez coaching", przyklad: "Zamiast dawać gotowe rady, zapytaj: 'Jak Ty, z twoją wiedzą i doświadczeniem, byś to rozwiązał? Interesuje mnie Twój punkt widzenia'." }
+    { rel: "Młodszy pracownik do Baby Boomera", wyzwanie: "Relacja przed zadaniem", przyklad: "Zacznij od: 'Dzień dobry, Panie Marku. Jak tam przygotowania do sezonu w ogrodzie? Mam sprawę dotyczącą raportu, czy możemy o niej chwilę porozmawiać?'" },
+    { rel: "Lider do Baby Boomera", wyzwanie: "Szacunek dla autorytetu", przyklad: "Przy delegowaniu powiedz: 'Pańskie doświadczenie w negocjacjach jest tu kluczowe. Chciałbym, aby to Pan poprowadził ten panel, by młodszy zespół mógł zobaczyć, jak budować zaufanie klienta'." },
+    { rel: "Specjalista do Baby Boomera", wyzwanie: "Nowe narzędzia (np. AI)", przyklad: "Zamiast narzucać, powiedz: 'Panie Janie, to narzędzie oszczędzi Panu żmudnego przepisywania danych. Chętnie pokażę Panu w 5 minut, jak to ułatwi Panu pracę nad analizą strategiczną'." },
+    { rel: "Współpracownik do Baby Boomera", wyzwanie: "Bezpośredniość komunikacji", przyklad: "Jeśli Boomer woli telefon, zadzwoń. Powiedz: 'Dzwonię, bo cenię nasze rozmowy na żywo. Chciałem potwierdzić tylko jeden szczegół w umowie'." },
+    { rel: "Zarząd do Baby Boomera", wyzwanie: "Zmiana roli w firmie", przyklad: "Zaproponuj: 'Chcielibyśmy, aby pełnił Pan rolę wewnętrznego Konsultanta. Pańska intuicja rynkowa jest dla nas ważniejsza niż obsługa systemów operacyjnych'." }
   ],
   X: [
-    { wyzwanie: "Samodzielność i Autonomia", przyklad: "X-y nie znoszą mikrozarządzania. Powiedz: 'Oto cel i budżet. Znasz się na tym najlepiej. Daj znać, jeśli napotkasz blokady, których nie możesz przeskoczyć'." },
-    { wyzwanie: "Konkret vs Korpomowa", przyklad: "Mów krótko. Zamiast 'Synergia międzydziałowa w aspekcie holistycznym', powiedz: 'Potrzebujemy, by IT dogadało się z marketingiem w sprawie baz danych'." },
-    { wyzwanie: "Docenienie pragmatyzmu", przyklad: "Pokaż, że cenisz ich spokój w kryzysie: 'Doceniam, jak opanowałeś tę sytuację. Twoje doświadczenie w takich sytuacjach naprawdę się tu przydało'." }
+    { rel: "Lider do pracownika Gen X", wyzwanie: "Potrzeba autonomii", przyklad: "Powiedz: 'Oto cel projektu i budżet. Ufam Twojemu doświadczeniu – zorganizuj to po swojemu. Spotkajmy się za tydzień, żebyś tylko dał mi znać, czy wszystko idzie zgodnie z Twoim planem'." },
+    { rel: "Junior do Gen X", wyzwanie: "Konkret vs Korpomowa", przyklad: "Zamiast opowiadać o wizji, powiedz: 'Potrzebuję Twojej decyzji w sprawie punktu 4. Mamy opcję A i B. Którą wybieramy, żeby projekt ruszył dalej?'" },
+    { rel: "Współpracownik do Gen X", wyzwanie: "Pragmatyzm i efektywność", przyklad: "Na spotkaniu: 'Słuchajcie, mamy 30 minut. Proponuję ustalić listę zadań, żeby każdy mógł wrócić do swojej pracy i zdążyć na spokojnie do domu'." },
+    { rel: "HR do pracownika Gen X", wyzwanie: "Docenienie lojalności", przyklad: "Podczas ewaluacji: 'Doceniamy Twoją stabilność. Przez te lata stałeś się filarem tego zespołu, na którym zawsze można polegać w sytuacjach kryzysowych'." },
+    { rel: "Menedżer do Gen X", wyzwanie: "Granice praca-dom", przyklad: "Zamiast maila o 20:00, ustaw wysyłkę na 8:00 rano. Powiedz: 'Szanuję Twój czas prywatny, dlatego wysyłam to teraz, żebyś mógł na spokojnie zacząć od tego dzień'." }
+  ],
+  Y: [
+    { rel: "Lider do Millenialsa", wyzwanie: "Coaching zamiast rozkazów", przyklad: "Zapytaj: 'Jak Ty byś podszedł do tego problemu, mając te dane? Chcę usłyszeć Twoją opinię, zanim podejmiemy wspólną decyzję'." },
+    { rel: "Starszy stażem do Millenialsa", wyzwanie: "Rozwój i optymalizacja", przyklad: "Powiedz: 'Widzę, że znalazłeś szybszy sposób na ten proces. Bardzo mi się to podoba. Czy możesz pokazać reszcie zespołu, jak to wdrożyć u nich?'" },
+    { rel: "Współpracownik do Millenialsa", wyzwanie: "Współpraca zespołowa", przyklad: "Powiedz: 'Cenię to, że zawsze szukasz sensu w tym, co robimy. Chodź, usiądziemy na 10 min i doprecyzujemy, jak nasze zadania wspierają cele firmy'." },
+    { rel: "Manager do Millenialsa", wyzwanie: "Feedback rozwojowy", przyklad: "Spróbuj: 'Masz wielki potencjał w analizie danych. Abyś mógł wejść na poziom seniorski, popracujmy nad formą prezentowania tych wniosków zarządowi'." },
+    { rel: "HR do Millenialsa", wyzwanie: "Elastyczność i dobrostan", przyklad: "Podczas rozmowy: 'Wiem, że zależy Ci na work-life integration. Jeśli potrzebujesz dziś skończyć wcześniej i dokończyć wieczorem, mamy do siebie zaufanie'." }
   ]
 };
 
 var QS = [
-  {sec:"Przekonania", txt:"Kiedy Z-etka pyta po tygodniu pracy o awans, myślę przede wszystkim:", opts:[
+  {txt:"Kiedy Z-etka pyta po tygodniu pracy o awans, myślę przede wszystkim:", opts:[
     {t:"Jest roszczeniowa – nie znają wartości cierpliwości",w:{BB:2,X:2,Y:0,Z:0},myth:true, gen:'Z'},
     {t:"Potrzebuje wiedzieć, że jej wysiłek ma sens i kierunek",w:{BB:0,X:0,Y:2,Z:2},myth:false},
     {t:"Nie pasuje do naszej kultury organizacyjnej",w:{BB:1,X:1,Y:0,Z:0},myth:true, gen:'Z'},
     {t:"To okazja do rozmowy o jej wartościach i motywacji",w:{BB:0,X:0,Y:1,Z:2},myth:false}
   ]},
-  {sec:"Przekonania", txt:"Baby Boomer nie używa Slacka i preferuje telefon. Reaguję:", opts:[
+  {txt:"Baby Boomer nie używa Slacka i preferuje telefon. Reaguję:", opts:[
     {t:"Dostosowuję się – dzwonię, skoro to dla niego ważne",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Musi się nauczyć nowych narzędzi – nie ma innej opcji",w:{BB:0,X:0,Y:1,Z:2},myth:true, gen:'BB'},
     {t:"Rozumiem – wychował się w innym środowisku komunikacyjnym",w:{BB:2,X:2,Y:0,Z:0},myth:false},
     {t:"Ogranicza efektywność całego zespołu",w:{BB:0,X:0,Y:1,Z:1},myth:true, gen:'BB'}
   ]},
-  {sec:"Przekonania", txt:"Millennial z 5-letnim stażem mówi, że chce work-life balance i nie zgadza się na nadgodziny. Oceniam to jako:", opts:[
+  {txt:"Millennial chce work-life balance i nie zgadza się na nadgodziny:", opts:[
     {t:"Brak zaangażowania i lojalności wobec firmy",w:{BB:2,X:1,Y:0,Z:0},myth:true, gen:'Y'},
     {t:"Sygnał wypalenia – powinienem sprawdzić jak się naprawdę czuje",w:{BB:0,X:1,Y:2,Z:1},myth:false},
     {t:"Uzasadnioną potrzebę, którą można uwzględnić w planowaniu",w:{BB:0,X:1,Y:2,Z:2},myth:false},
     {t:"Cechę pokoleniową – Millenialsi po prostu tacy są",w:{BB:1,X:0,Y:0,Z:0},myth:true, gen:'Y'}
   ]},
-  {sec:"Przekonania", txt:"Pokolenie X nie angażuje się w inicjatywy integracyjne. Interpretujesz to jako:", opts:[
+  {txt:"Pokolenie X nie angażuje się w inicjatywy integracyjne:", opts:[
     {t:"Typowe – X-ki są zamknięte i indywidualistyczne",w:{BB:0,X:0,Y:1,Z:1},myth:true, gen:'X'},
     {t:"Sygnał, że te inicjatywy nie odpowiadają ich potrzebom",w:{BB:1,X:2,Y:1,Z:0},myth:false},
     {t:"Może zbyt dużo pracy operacyjnej – nie mają zasobów",w:{BB:1,X:2,Y:0,Z:0},myth:false},
     {t:"Problem z moją komunikacją – powinienem zapytać wprost",w:{BB:0,X:1,Y:2,Z:1},myth:false}
   ]},
-  {sec:"Przekonania", txt:"Zdanie: \"Każde pokolenie jest inne i trzeba z każdym rozmawiać inaczej\" – reaguję:", opts:[
+  {txt:"Zdanie: \"Każde pokolenie jest inne i trzeba z każdym rozmawiać inaczej\":", opts:[
     {t:"Przesada – ludzie są ludźmi, niezależnie od wieku",w:{BB:0,X:0,Y:1,Z:0},myth:true, gen:'ALL'},
-    {t:"Tak, ale różnice dotyczą wartości i kontekstu, nie natury człowieka",w:{BB:1,X:1,Y:2,Z:2},myth:false},
+    {t:"Tak, ale różnice dotyczą wartości i kontekstu",w:{BB:1,X:1,Y:2,Z:2},myth:false},
     {t:"Zgadzam się w 100% i staram się to stosować",w:{BB:1,X:1,Y:2,Z:2},myth:false},
-    {t:"To polityczna poprawność – nie da się wdrożyć w codziennej pracy",w:{BB:0,X:0,Y:0,Z:0},myth:true, gen:'ALL'}
+    {t:"To polityczna poprawność – nie da się wdrożyć",w:{BB:0,X:0,Y:0,Z:0},myth:true, gen:'ALL'}
   ]},
-  {sec:"Świadomość", txt:"Otrzymujesz mail od Z-etki: \"Nie widzę sensu w tym projekcie. Po co w ogóle to robimy?\" Twoja pierwsza reakcja:", opts:[
+  {txt:"Mail od Z-etki: \"Nie widzę sensu w tym projekcie. Po co to robimy?\":", opts:[
     {t:"Irytacja – kto tak pisze do przełożonego?",w:{BB:1,X:0,Y:0,Z:0},myth:false},
     {t:"Ciekawość – co stoi za tym pytaniem?",w:{BB:0,X:1,Y:2,Z:2},myth:false},
     {t:"Niepokój – może faktycznie coś przegapiłem?",w:{BB:0,X:1,Y:1,Z:0},myth:false},
     {t:"Satysfakcja – zaangażowany pracownik zadaje pytania",w:{BB:0,X:0,Y:2,Z:2},myth:false}
   ]},
-  {sec:"Świadomość", txt:"Podczas spotkania online Baby Boomer przerywa co chwilę i mówi długimi zdaniami. Zauważam w sobie:", opts:[
+  {txt:"Baby Boomer przerywa na spotkaniu online i mówi długo:", opts:[
     {t:"Niecierpliwość – to nieefektywne",w:{BB:0,X:0,Y:1,Z:2},myth:false},
-    {t:"Szacunek – ma doświadczenie i warto go s\u0142ucha\u0107",w:{BB:2,X:1,Y:0,Z:0},myth:false},
+    {t:"Szacunek – ma doświadczenie i warto go słuchać",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Chęć przerwania i skrócenia rozmowy",w:{BB:0,X:0,Y:1,Z:2},myth:false},
-    {t:"Potrafi\u0119 zarz\u0105dza\u0107 emocjami i aktywnie s\u0142ucham",w:{BB:1,X:1,Y:1,Z:1},myth:false}
+    {t:"Potrafię zarządzać emocjami i aktywnie słucham",w:{BB:1,X:1,Y:1,Z:1},myth:false}
   ]},
-  {sec:"Świadomość", txt:"Zanim wy\u015blesz wa\u017cny komunikat do zespołu, zatrzymujesz si\u0119 i pytasz siebie:", opts:[
+  {txt:"Zanim wyślesz ważny komunikat do zespołu, pytasz siebie:", opts:[
     {t:"Czy to jest jasne i zwięzłe?",w:{BB:1,X:2,Y:1,Z:1},myth:false},
-    {t:"Jak różne osoby mogą odebrać te s\u0142owa?",w:{BB:1,X:1,Y:2,Z:2},myth:false},
-    {t:"Zazwyczaj po prostu wysyłam – nie analizuj\u0119",w:{BB:0,X:0,Y:0,Z:0},myth:false},
+    {t:"Jak różne osoby mogą odebrać te słowa?",w:{BB:1,X:1,Y:2,Z:2},myth:false},
+    {t:"Zazwyczaj po prostu wysyłam – nie analizuję",w:{BB:0,X:0,Y:0,Z:0},myth:false},
     {t:"Czy uwzględniam język i styl każdego odbiorcy?",w:{BB:1,X:1,Y:2,Z:2},myth:false}
   ]},
-  {sec:"Świadomość", txt:"Twój komunikat wywołał nieoczekiwaną złość u kogoś z innego pokolenia. Reagujesz:", opts:[
-    {t:"T\u0142umacz\u0119, \u017ce zosta\u0142em \u017ale zrozumiany",w:{BB:1,X:1,Y:0,Z:0},myth:false},
-    {t:"Pytam, co w moim komunikacie tak zadzia\u0142a\u0142o",w:{BB:0,X:1,Y:2,Z:2},myth:false},
-    {t:"Staram si\u0119 naprawi\u0107 relacj\u0119, przepraszam",w:{BB:0,X:0,Y:2,Z:1},myth:false},
-    {t:"Analizuj\u0119, jak nast\u0119pnym razem sformu\u0142owa\u0107 inaczej",w:{BB:0,X:1,Y:2,Z:2},myth:false}
+  {txt:"Twój komunikat wywołał nieoczekiwaną złość u kogoś z innego pokolenia:", opts:[
+    {t:"Tłumaczę, że zostałem źle zrozumiany",w:{BB:1,X:1,Y:0,Z:0},myth:false},
+    {t:"Pytam, co w moim komunikacie tak zadziałało",w:{BB:0,X:1,Y:2,Z:2},myth:false},
+    {t:"Staram się naprawić relację, przepraszam",w:{BB:0,X:0,Y:2,Z:1},myth:false},
+    {t:"Analizuję, jak następnym razem sformułować inaczej",w:{BB:0,X:1,Y:2,Z:2},myth:false}
   ]},
-  {sec:"Świadomość", txt:"Pojęcie \"reakcja automatyczna\" w komunikacji interpersonalnej:", opts:[
-    {t:"Znam i potrafię rozpoznawać moje własne automatyczne reakcje",w:{BB:0,X:1,Y:2,Z:2},myth:false},
-    {t:"S\u0142ysza\u0142em, ale nie stosuj\u0119 w codziennej pracy",w:{BB:1,X:1,Y:1,Z:0},myth:false},
+  {txt:"Pojęcie \"reakcja automatyczna\" w komunikacji:", opts:[
+    {t:"Znam i potrafię rozpoznawać moje własne reakcje",w:{BB:0,X:1,Y:2,Z:2},myth:false},
+    {t:"Słyszałem, ale nie stosuję w codziennej pracy",w:{BB:1,X:1,Y:1,Z:0},myth:false},
     {t:"To psychologiczny żargon – wolę konkretne narzędzia",w:{BB:2,X:1,Y:0,Z:0},myth:false},
-    {t:"Rozumiem i aktywnie pracuj\u0119 nad świadomością reakcji",w:{BB:0,X:1,Y:2,Z:2},myth:false}
+    {t:"Rozumiem i pracuję nad świadomością reakcji",w:{BB:0,X:1,Y:2,Z:2},myth:false}
   ]},
-  {sec:"Strategie", txt:"Rozmowa rekrutacyjna z kandydatem z Gen Z. Jakie pytanie najlepiej zbada jego motywację?", opts:[
+  {txt:"Rekrutacja Gen Z. Pytanie najlepiej badające motywację:", opts:[
     {t:"Dlaczego chce Pan/Pani pracować w naszej firmie?",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Co dla Pana/Pani znaczy sensowna praca?",w:{BB:0,X:1,Y:2,Z:2},myth:false},
     {t:"Gdzie widzi się Pan/Pani za 5 lat?",w:{BB:2,X:1,Y:0,Z:0},myth:false},
-    {t:"Jakie projekty sprawiają, że chce się Panu/Pani wstawać rano?",w:{BB:0,X:1,Y:2,Z:2},myth:false}
+    {t:"Jakie projekty sprawiają, że chce się Panu wstawać rano?",w:{BB:0,X:1,Y:2,Z:2},myth:false}
   ]},
-  {sec:"Strategie", txt:"Przekazujesz feedback Baby Boomerowi, który ma problem z delegowaniem. Zaczynasz od:", opts:[
-    {t:"Bezpośredniego wskazania problemu – szanuję jego czas",w:{BB:2,X:2,Y:1,Z:0},myth:false},
-    {t:"Podkreślenia jego autorytetu i doświadczenia w zespole",w:{BB:2,X:1,Y:0,Z:0},myth:false},
-    {t:"Pytania o to, jak sam ocenia swoją pracę z zespołem",w:{BB:1,X:2,Y:2,Z:1},myth:false},
-    {t:"Wyjaśnienia, jak delegowanie wpłynie na jego wyniki i status",w:{BB:2,X:1,Y:0,Z:0},myth:false}
+  {txt:"Feedback dla Baby Boomera (problem z delegowaniem):", opts:[
+    {t:"Bezpośrednie wskazanie problemu",w:{BB:2,X:2,Y:1,Z:0},myth:false},
+    {t:"Podkreślenie jego autorytetu i doświadczenia",w:{BB:2,X:1,Y:0,Z:0},myth:false},
+    {t:"Pytanie o to, jak sam ocenia swoją pracę z zespołem",w:{BB:1,X:2,Y:2,Z:1},myth:false},
+    {t:"Wyjaśnienie, jak delegowanie wpłynie na jego wyniki",w:{BB:2,X:1,Y:0,Z:0},myth:false}
   ]},
-  {sec:"Strategie", txt:"Onboarding dla nowego Millenialsa z 3-letnim doświadczeniem. Stawiasz na:", opts:[
-    {t:"Szczegółowy program z checklistami i procedurami",w:{BB:2,X:2,Y:0,Z:0},myth:false},
-    {t:"Buddy system + jasny cel na pierwsze 30/60/90 dni",w:{BB:0,X:1,Y:2,Z:2},myth:false},
-    {t:"Szybkie wrzucenie w projekty – nauczy się w działaniu",w:{BB:0,X:0,Y:1,Z:2},myth:false},
-    {t:"Rozmowę o wartościach firmy i jej wpływie społecznym",w:{BB:0,X:0,Y:2,Z:2},myth:false}
+  {txt:"Onboarding Millenialsa z 3-letnim doświadczeniem:", opts:[
+    {t:"Szczegółowy program z checklistami",w:{BB:2,X:2,Y:0,Z:0},myth:false},
+    {t:"Buddy system + jasny cel na 30/60/90 dni",w:{BB:0,X:1,Y:2,Z:2},myth:false},
+    {t:"Szybkie wrzucenie w projekty – nauka w działaniu",w:{BB:0,X:0,Y:1,Z:2},myth:false},
+    {t:"Rozmowa o wartościach firmy i jej wpływie społecznym",w:{BB:0,X:0,Y:2,Z:2},myth:false}
   ]},
-  {sec:"Strategie", txt:"Napięcie w zespole: X-ki chcą telekonferencji, Z-etki wolą chat. Jako HR reagujesz:", opts:[
-    {t:"Ustalasz jedno obowiązujące narzędzie dla wszystkich",w:{BB:2,X:1,Y:0,Z:0},myth:false},
-    {t:"Organizujesz rozmowę o potrzebach stojących za preferencjami",w:{BB:0,X:1,Y:2,Z:2},myth:false},
+  {txt:"Napięcie w zespole: X chce telco, Z chce chat. Jako HR:", opts:[
+    {t:"Ustalasz jedno narzędzie dla wszystkich",w:{BB:2,X:1,Y:0,Z:0},myth:false},
+    {t:"Organizujesz rozmowę o potrzebach za preferencjami",w:{BB:0,X:1,Y:2,Z:2},myth:false},
     {t:"Wprowadzasz zasadę: temat decyduje o narzędziu",w:{BB:1,X:2,Y:2,Z:1},myth:false},
-    {t:"Zostawiasz to zespołowi do samodzielnego ustalenia",w:{BB:0,X:1,Y:1,Z:1},myth:false}
+    {t:"Zostawiasz to zespołowi do ustalenia",w:{BB:0,X:1,Y:1,Z:1},myth:false}
   ]},
-  {sec:"Strategie", txt:"Szkolenie z komunikacji ma objąć wszystkie pokolenia. Klucz do sukcesu to:", opts:[
-    {t:"Jeden format dla wszystkich – równość i spójność",w:{BB:2,X:1,Y:0,Z:0},myth:false},
-    {t:"Nagranie dostępne on-demand – każdy kiedy chce",w:{BB:0,X:1,Y:1,Z:2},myth:false},
-    {t:"Mix: live + nagranie + materiały do pracy",w:{BB:1,X:2,Y:2,Z:2},myth:false},
-    {t:"Warsztaty z prawdziwymi sytuacjami z firmowej codzienności",w:{BB:1,X:2,Y:2,Z:1},myth:false}
+  {txt:"Szkolenie wielopokoleniowe. Klucz do sukcesu to:", opts:[
+    {t:"Jeden format dla wszystkich – spójność",w:{BB:2,X:1,Y:0,Z:0},myth:false},
+    {t:"Nagranie dostępne on-demand",w:{BB:0,X:1,Y:1,Z:2},myth:false},
+    {t:"Mix: live + nagranie + materiały",w:{BB:1,X:2,Y:2,Z:2},myth:false},
+    {t:"Warsztaty z prawdziwymi sytuacjami",w:{BB:1,X:2,Y:2,Z:1},myth:false}
   ]}
 ];
 
@@ -213,7 +219,7 @@ var answers = new Array(15).fill(null);
 function buildQuestions() {
   var html = '';
   QS.forEach(function(q, qi) {
-    html += '<div class="q-card"><div class="q-text">' + q.txt + '</div><div class="opts">';
+    html += '<div class="q-card"><p><strong>' + q.txt + '</strong></p>';
     q.opts.forEach(function(o, oi) {
       html += `<div class="opt" id="opt-${qi}-${oi}" onclick="pickAnswer(${qi},${oi})"><label>${o.t}</label></div>`;
     });
@@ -262,16 +268,17 @@ function renderIndividual(res) {
   };
   var p = PT[res.profile];
   
-  // LOGIKA LOSOWANIA WSKAZÓWEK (Dla Marcina: Losuje 1 zestaw z banku dla każdego błędu)
   var tipsHtml = '';
   var usedGens = [];
-
   res.stereos.forEach(s => {
     if(!usedGens.includes(s.gen) && TIPS_BANK[s.gen]) {
         var bank = TIPS_BANK[s.gen];
-        var randomTip = bank[Math.floor(Math.random() * bank.length)]; // Magia losowania
-        tipsHtml += `<div class="tip-box"><p><strong>Wyzwanie: ${randomTip.wyzwanie}</strong></p>
-        <span class="tip-example">PRZYKŁAD: ${randomTip.przyklad}</span></div>`;
+        var randomTip = bank[Math.floor(Math.random() * bank.length)];
+        tipsHtml += `<div class="tip-box">
+          <span class="tip-rel">RELACJA: ${randomTip.rel}</span>
+          <p><strong>Wyzwanie: ${randomTip.wyzwanie}</strong></p>
+          <span class="tip-example">PRZYKŁAD: ${randomTip.przyklad}</span>
+        </div>`;
         usedGens.push(s.gen);
     }
   });
