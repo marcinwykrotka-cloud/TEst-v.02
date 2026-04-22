@@ -72,7 +72,7 @@ db.ref('wyniki').on('value', (snapshot) => {
 
     // Maksymalna możliwa liczba punktów dla jednej kategorii to ok. 20-25 w Twoim teście
     // Ustawiamy dzielnik na 20, aby paski były długie i czytelne jak na skrinie
-    const maxScale = 20; 
+    const maxScale = 7.5; 
 
     gens.forEach(g => {
         const avg = (arr.reduce((s,r)=>s+r[g.k],0)/n).toFixed(1);
