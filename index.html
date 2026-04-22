@@ -19,9 +19,9 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 
 .app { max-width: 750px; margin: 0 auto; padding: 20px 16px 60px; }
 
-/* Nagłówek Brandingowy w PDF */
-.pdf-branding { display: none; text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
-.pdf-branding h2 { color: var(--violet); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+/* Nagłówek Brandingowy tylko do PDF */
+.pdf-branding { display: none; text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 25px; }
+.pdf-branding h2 { color: var(--violet); font-size: 16px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
 
 .hdr { background: var(--plum); border-radius: var(--radius); padding: 25px; margin-bottom: 5px; position: relative; overflow: hidden; }
 .hdr h1 { font-size: 24px; font-family: Georgia, serif; color: var(--wgold); position: relative; z-index: 1; }
@@ -55,7 +55,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 .synergy-table th { background: #f2f2f2; border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; }
 .synergy-table td { border: 1px solid #ddd; padding: 10px; font-size: 13px; line-height: 1.5; }
 
-@media print { .btn-pdf { display: none; } }
+.congrats-card { background: #e8f5e9; border: 2px solid #2e7d32; padding: 15px; border-radius: 8px; color: #1b5e20; font-weight: bold; margin-bottom: 20px; text-align: center; }
 </style>
 </head>
 <body>
@@ -68,17 +68,17 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
   <div id="quiz-view">
     <div class="hdr">
       <h1>Pokoleniowy Kompas HR</h1>
-      <div class="sub">Twój przewodnik po relacjach w zespole</div>
+      <div class="sub">Personalizowana analiza Twojej komunikacji</div>
     </div>
     <div class="gold-bar"></div>
 
     <div class="intro-box">
       <h3>Jak korzystać z testu?</h3>
-      <p>Odpowiedz szczerze – nie ma złych ani dobrych odpowiedzi. Test mierzy Twoje <strong>naturalne strategie</strong> i <strong>przekonania</strong> w kontakcie z różnymi pokoleniami. Wyniki wskażą Twoje unikalne podejście oraz dadzą Ci praktyczne wskazówki do natychmiastowego wdrożenia.</p>
+      <p>Odpowiedz szczerze – nie ma złych ani dobrych odpowiedzi. Test mierzy Twoje <strong>naturalne strategie</strong> i <strong>przekonania</strong> w kontakcie z różnymi pokoleniami. Na końcu otrzymasz raport z konkretnymi scenariuszami działań.</p>
     </div>
 
     <div id="q-container"></div>
-    <button class="btn" id="submit-btn" onclick="submitTest()">Generuj analizę wyników &rarr;</button>
+    <button class="btn" id="submit-btn" onclick="submitTest()">Generuj raport i wskazówki &rarr;</button>
   </div>
   
   <div id="ind-results"></div>
@@ -181,149 +181,4 @@ var QS = [
     {t:"Jeden format dla wszystkich – równość i spójność",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Nagranie dostępne on-demand – każdy kiedy chce",w:{BB:0,X:1,Y:1,Z:2},myth:false},
     {t:"Mix: live + nagranie + materiały do pracy",w:{BB:1,X:2,Y:2,Z:2},myth:false},
-    {t:"Warsztaty z prawdziwymi sytuacjami z firmowej codzienności",w:{BB:1,X:2,Y:2,Z:1},myth:false}
-  ]}
-];
-
-var answers = new Array(15).fill(null);
-
-function buildQuestions() {
-  var html = '';
-  QS.forEach(function(q, qi) {
-    html += '<div class="q-card"><div class="q-text">' + q.txt + '</div><div class="opts">';
-    q.opts.forEach(function(o, oi) {
-      html += `<div class="opt" id="opt-${qi}-${oi}" onclick="pickAnswer(${qi},${oi})"><label>${o.t}</label></div>`;
-    });
-    html += '</div></div>';
-  });
-  document.getElementById('q-container').innerHTML = html;
-}
-
-function pickAnswer(qi, oi) {
-  answers[qi] = oi;
-  for (var i = 0; i < 4; i++) { var el = document.getElementById('opt-' + qi + '-' + i); if (el) el.classList.remove('sel'); }
-  document.getElementById('opt-' + qi + '-' + oi).classList.add('sel');
-  renderProgressBar();
-}
-
-function renderProgressBar() {
-  var done = answers.filter(a => a !== null).length;
-  document.getElementById('prog-fill').style.width = (done/15*100)+'%';
-}
-
-function calcScores(ans) {
-  var sc = {BB:0, X:0, Y:0, Z:0}; var mythsCount = 0; var stereos = [];
-  ans.forEach((ai, qi) => {
-    var opt = QS[qi].opts[ai];
-    sc.BB += opt.w.BB; sc.X += opt.w.X; sc.Y += opt.w.Y; sc.Z += opt.w.Z;
-    if (opt.myth) { mythsCount++; stereos.push({txt: opt.t, gen: opt.gen}); }
-  });
-  var flex = Math.min(100, Math.round((sc.BB+sc.X+sc.Y+sc.Z)/75*100));
-  var profile = flex >= 75 ? 'Ambasador' : flex >= 45 ? 'Mediator' : 'Odkrywca';
-  var maxVal = Math.max(sc.BB, sc.X, sc.Y, sc.Z);
-  var closest = Object.keys(sc).find(key => sc[key] === maxVal);
-  return { sc, flex, mythsCount, stereos, awareness: Math.max(0, 100 - mythsCount * 15), profile, closest };
-}
-
-async function submitTest() {
-  if (answers.includes(null)) { alert("Uzupełnij wszystkie odpowiedzi przed wysłaniem!"); return; }
-  var res = calcScores(answers);
-  document.getElementById('quiz-view').style.display = 'none';
-  try {
-    await db.ref('wyniki').push({ flex: res.flex, myths: res.mythsCount, BB: res.sc.BB, X: res.sc.X, Y: res.sc.Y, Z: res.sc.Z, profile: res.profile });
-  } catch(e) {}
-  renderIndividual(res);
-}
-
-function renderIndividual(res) {
-  var PT = {
-    Ambasador: { icon:'🌟', full:'Pokoleniowy Ambasador', desc:'Twoje podejście promuje synergię i otwartość. Rozumiesz rzadką sztukę adaptacji stylu komunikacji do potrzeb odbiorcy bez tracenia własnej autentyczności.' },
-    Mediator: { icon:'🔍', full:'Rozwijający się Mediator', desc:'Masz solidne fundamenty, ale wciąż działasz na pewnych automatyzmach. Kluczem dla Ciebie będzie świadome zatrzymanie się przed reakcją.' },
-    Odkrywca: { icon:'🚀', full:'Odkrywca Pokoleń', desc:'Dopiero zaczynasz dostrzegać głębię różnic. To świetny punkt startowy do dekonstrukcji schematów, które ograniczają Twoją skuteczność.' }
-  };
-  var p = PT[res.profile];
-  
-  // ROZBUDOWANE WSKAZÓWKI BEZ ŹRÓDEŁ
-  var tipsHtml = '';
-  res.stereos.forEach(s => {
-    if(s.gen === 'Z') {
-      tipsHtml += `<div class="tip-box"><p><strong>Wyzwanie: Roszczeniowość vs Potrzeba Sensu.</strong> Zamiast postrzegać szybkie pytania o awans jako brak pokory, potraktuj je jako głód wpływu. Zetki nie chcą czekać latami, bo świat pędzi.</p>
-      <span class="tip-example">PRZYKŁAD: Zamiast "Na awans trzeba zapracować", powiedz: "Twoja energia jest świetna. Ustalmy 3 konkretne kamienie milowe, po których osiągnięciu wrócimy do rozmowy o nowej roli".</span></div>`;
-    }
-    if(s.gen === 'BB') {
-      tipsHtml += `<div class="tip-box"><p><strong>Wyzwanie: Opór technologiczny vs Relacje.</strong> Baby Boomerzy cenią autorytet i stabilność. Dla nich brak użycia Slacka to nie złośliwość, a wybór narzędzia dającego większą pewność i bliskość (telefon).</p>
-      <span class="tip-example">PRZYKŁAD: Zamiast "Wszystko jest na kanale", powiedz: "Wiem, że wolisz telefon, zadzwonię za 5 minut, by omówić najważniejszy punkt, a resztę potwierdzę pisemnie dla porządku".</span></div>`;
-    }
-    if(s.gen === 'Y') {
-      tipsHtml += `<div class="tip-box"><p><strong>Wyzwanie: Work-Life Balance vs Brak Lojalności.</strong> Millenialsi widzieli wypalenie swoich rodziców. Ich granice to wyraz dbałości o długofalową efektywność, a nie chęć ucieczki z pracy.</p>
-      <span class="tip-example">PRZYKŁAD: Zamiast oceniać niechęć do pracy w nadgodzinach, zapytaj: "Widzę, że dbasz o czas po pracy. Jak możemy ułożyć proces, byś w swoich godzinach czuł, że robisz to, co najważniejsze?".</span></div>`;
-    }
-    if(s.gen === 'X') {
-      tipsHtml += `<div class="tip-box"><p><strong>Wyzwanie: Indywidualizm vs Samodzielność.</strong> Pokolenie X to dzieci z kluczami na szyi. Ich dystans do integracji to często wyraz pragmatyzmu – wolą zrobić robotę i wrócić do życia prywatnego.</p>
-      <span class="tip-example">PRZYKŁAD: Zamiast zmuszać do integracji, powiedz: "Doceniam Twoją samodzielność. Potrzebuję Twojego doświadczenia w tym projekcie – jakiej formy współpracy potrzebujesz, bym Ci nie przeszkadzał?".</span></div>`;
-    }
-  });
-  if(!tipsHtml) tipsHtml = '<div class="tip-box">✓ Twoje odpowiedzi wskazują na wysoką elastyczność i brak aktywnych uprzedzeń. Kontynuuj budowanie kultury Multipliera!</div>';
-
-  var synergyTable = `
-    <table class="synergy-table">
-      <tr><th>Kto z kim współpracuje najlepiej?</th><th>Dlaczego to działa?</th></tr>
-      <tr><td><strong>Zetki + Boomerzy</strong></td><td>To duet marzeń w mentoringu odwróconym. Zetki dają świeżość i technologię, Boomerzy dają spokój i kontakty.</td></tr>
-      <tr><td><strong>Gen X + Millenialsi</strong></td><td>Oba pokolenia cenią konkret. X-y dają "jak to zrobić", a Y-ki dają "zróbmy to mądrzej".</td></tr>
-    </table>`;
-
-  var congrats = (res.flex === 100 && res.mythsCount === 0) ? '<div class="congrats-card">🎉 Gratulacje! Twoja postawa jest wzorem inkluzywności międzypokoleniowej!</div>' : '';
-
-  document.getElementById('ind-results').innerHTML = `
-    <div class="res-box">
-      <div class="res-head"><div class="res-title">${p.icon} ${p.full}</div></div>
-      <div class="res-body">
-        ${congrats}
-        <div class="score-grid">
-          <div class="sc" style="border-color:var(--violet)"><div class="lbl">Elastyczność</div><div class="val">${res.flex}%</div></div>
-          <div class="sc" style="border-color:var(--gold)"><div class="lbl">Świadomość</div><div class="val">${res.awareness}%</div></div>
-        </div>
-        <div class="ph3">Twoja dominująca strategia: ${res.closest}</div>
-        <p style="font-size:13px; margin-bottom:15px">Na podstawie Twoich wyborów, Twoje podejście jest najbliższe dynamice pokolenia <strong>${res.closest}</strong>. Poniżej zobaczysz, jak ta dynamika współgra z innymi:</p>
-        ${synergyTable}
-        <div class="ph3">Praktyczne wskazówki rozwojowe</div>
-        ${tipsHtml}
-        <button class="btn btn-pdf" onclick="generatePDF()">Pobierz raport PDF &darr;</button>
-      </div>
-    </div>`;
-  window.scrollTo(0,0);
-}
-
-function generatePDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const header = document.getElementById('pdf-header');
-    header.style.display = 'block'; // Pokaż nagłówek dla PDF
-
-    html2canvas(document.getElementById('pdf-area'), {scale: 2}).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 210; 
-        const pageHeight = 295;  
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        let heightLeft = imgHeight;
-        let position = 0;
-
-        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
-            doc.addPage();
-            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-        }
-        
-        doc.save("Raport_Pokoleniowy_VIA_Multiplier.pdf");
-        header.style.display = 'none'; // Ukryj po wygenerowaniu
-    });
-}
-
-buildQuestions();
-</script>
-</body>
-</html>
+    {t:"Warsztaty z prawdziwymi sytuacjami z firmowej codzienności",w:{BB:1,X:2,Y:2,Z:1},
