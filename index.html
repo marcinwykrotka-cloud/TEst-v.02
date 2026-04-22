@@ -4,78 +4,86 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pokoleniowy Kompas HR – VIA Multiplier</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
 :root {
   --plum: #2D1B4E; --violet: #5B2D8E; --lav: #9B72CF;
   --gold: #D4A843; --wgold: #F0C060; --cream: #FAF7F2;
   --white: #ffffff; --gray: #6B6B8A; --lightpur: #E8DEF8;
   --bb: #2D1B4E; --x: #3D2460; --y: #4A2C8A; --z: #5B2D8E;
-  --ok: #1a6040; --myth: #8B0000; --warn: #c27700;
   --radius: 10px; --shadow: 0 2px 12px rgba(45,27,78,0.10);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream); color: #222; min-height: 100vh; }
+
 .app { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
 .hdr { background: var(--plum); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 5px; position: relative; overflow: hidden; }
-.hdr::after { content:''; position:absolute; right:-30px; top:-30px; width:140px; height:140px; border-radius:50%; background:var(--violet); opacity:.3; }
-.hdr .brand { font-size: 9px; letter-spacing: 3px; color: var(--lav); text-transform: uppercase; margin-bottom: 5px; }
 .hdr h1 { font-size: 22px; font-family: Georgia, serif; color: var(--wgold); position: relative; z-index: 1; }
 .hdr .sub { font-size: 12px; color: var(--lav); margin-top: 4px; }
 .gold-bar { height: 4px; background: var(--gold); border-radius: 0 0 4px 4px; margin-bottom: 18px; }
+
+/* Instrukcja */
+.intro-box { background: var(--white); border: 1.5px solid #e0d8f0; border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px; box-shadow: var(--shadow); line-height: 1.6; }
+.intro-box h3 { color: var(--plum); margin-bottom: 8px; font-size: 16px; }
+
 .prog-wrap { margin-bottom: 18px; }
 .prog-bar { height: 7px; background: #e0d8f0; border-radius: 6px; overflow: hidden; }
 .prog-fill { height: 100%; background: linear-gradient(90deg, var(--violet), var(--gold)); border-radius: 6px; transition: width .35s; width: 0%; }
 .prog-label { font-size: 11px; color: var(--gray); margin-top: 5px; }
+
 .q-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px 18px; margin-bottom: 14px; border-top: 3px solid var(--violet); }
-.q-sec { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); font-weight: 700; margin-bottom: 3px; }
-.q-num { font-size: 10px; letter-spacing: 1px; color: var(--lav); font-weight: 700; margin-bottom: 7px; text-transform: uppercase; }
 .q-text { font-size: 14px; font-family: Georgia, serif; line-height: 1.6; color: #1a1a2e; margin-bottom: 14px; }
 .opts { display: flex; flex-direction: column; gap: 8px; }
-.opt { display: flex; align-items: flex-start; gap: 11px; padding: 10px 13px; border: 1.5px solid #e0d8f0; border-radius: 8px; cursor: pointer; background: var(--cream); }
-.opt.sel { border-color: var(--violet); background: #ede7f6; }
-.opt input[type=radio] { accent-color: var(--violet); cursor: pointer; }
-.opt label { cursor: pointer; font-size: 13px; line-height: 1.45; color: #333; }
-.btn { display: inline-block; padding: 13px 32px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; background: var(--violet); color: #fff; width: 100%; }
-.center { text-align: center; margin-top: 22px; }
-.submit-msg { font-size: 12px; text-align: center; margin-top: 10px; color: var(--ok); }
-.res-box { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-top: 22px; text-align: left; }
-.res-head { background: var(--plum); padding: 22px 26px; }
+.opt { display: flex; align-items: flex-start; gap: 11px; padding: 10px 13px; border: 1.5px solid #e0d8f0; border-radius: 8px; cursor: pointer; background: var(--cream); transition: 0.15s; }
+.opt.sel { border-color: var(--violet); background: #ede7f6; font-weight: 600; }
+.opt label { cursor: pointer; font-size: 13px; color: #333; }
+
+.btn { display: inline-block; padding: 13px 32px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; background: var(--violet); color: #fff; width: 100%; margin-top: 10px;}
+.btn-pdf { background: #1a6040; margin-top: 20px; }
+
+/* Wyniki */
+.res-box { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-top: 22px; }
+.res-head { background: var(--plum); padding: 22px 26px; color: white;}
 .res-title { font-size: 20px; font-family: Georgia, serif; color: var(--wgold); }
-.res-sub { font-size: 12px; color: var(--lav); margin-top: 4px; }
 .res-body { padding: 22px 26px; }
 .score-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 18px; }
-.sc { text-align: center; padding: 13px 6px; border-radius: 8px; }
-.sc .lbl { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
-.sc .val { font-size: 30px; font-family: Georgia, serif; font-weight: 700; }
-.gen-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
-.gc { text-align: center; padding: 10px 4px; border-radius: 8px; }
-.gc .gl { font-size: 9px; font-weight: 700; margin-bottom: 3px; text-transform: uppercase; }
-.gc .gv { font-size: 24px; font-family: Georgia, serif; font-weight: 700; }
-.ph3 { font-size: 13px; font-weight: 700; color: var(--plum); margin-bottom: 9px; border-bottom: 2px solid var(--lightpur); }
+.sc { text-align: center; padding: 13px 6px; border-radius: 8px; border: 1.5px solid; }
+.sc .lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+.sc .val { font-size: 30px; font-family: Georgia, serif; }
+
+.synergy-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
+.synergy-table th { background: #f2f2f2; border: 1px solid #ddd; padding: 8px; text-align: left; }
+.synergy-table td { border: 1px solid #ddd; padding: 8px; }
+
 .myth-item { background: #fdf3d7; border-left: 3px solid var(--gold); padding: 9px 12px; margin-bottom: 8px; font-size: 12px; }
 .tip-item { background: var(--lightpur); border-left: 3px solid var(--violet); padding: 9px 12px; margin-bottom: 8px; font-size: 12px; }
-.cta-box { background: var(--plum); padding: 18px 22px; border-radius: 9px; text-align: center; color: white; margin-top: 20px; }
+.congrats-card { background: #e8f5e9; border: 2px solid #2e7d32; padding: 15px; border-radius: 8px; color: #1b5e20; font-weight: bold; margin-bottom: 15px; text-align: center; }
 </style>
 </head>
 <body>
-<div class="app" id="app-container">
+<div class="app" id="pdf-content">
   <div id="quiz-view">
     <div class="hdr">
-      <div class="brand">VIA Multiplier &middot; Szkolenia i Coaching</div>
       <h1>Pokoleniowy Kompas HR</h1>
-      <div class="sub">Test diagnostyczny &middot; 15 pytań &middot; ok. 7 minut</div>
+      <div class="sub">VIA Multiplier &middot; Szkolenia i Coaching</div>
     </div>
     <div class="gold-bar"></div>
+
+    <div class="intro-box">
+      <h3>Jak korzystać z testu?</h3>
+      <p>Odpowiedz szczerze – nie ma złych ani dobrych odpowiedzi. Test mierzy Twoje <strong>naturalne strategie</strong> i <strong>przekonania</strong> w kontakcie z różnymi pokoleniami. Wyniki wskażą mocne strony i obszary do rozwoju.</p>
+    </div>
+
     <div class="prog-wrap">
       <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
       <div class="prog-label" id="prog-label">Odpowiedziano: 0 z 15</div>
     </div>
     <div id="q-container"></div>
-    <div class="center" id="submit-area">
-      <button class="btn" onclick="submitTest()">Zobacz moje wyniki &rarr;</button>
-      <div class="submit-msg" id="submit-msg"></div>
-    </div>
+    <button class="btn" id="submit-btn" onclick="submitTest()">Zobacz moje wyniki &rarr;</button>
   </div>
+  
   <div id="ind-results"></div>
 </div>
 
@@ -83,42 +91,40 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
 <script>
-const firebaseConfig = { 
-    databaseURL: "https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app" 
-};
+const firebaseConfig = { databaseURL: "https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 var QS = [
   {sec:"Sekcja 1: Przekonania i mity", txt:"Kiedy Z-etka pyta po tygodniu pracy o awans, myślę przede wszystkim:", opts:[
-    {t:"Jest roszczeniowa – nie znają wartości cierpliwości",w:{BB:2,X:2,Y:0,Z:0},myth:true},
+    {t:"Jest roszczeniowa – nie znają wartości cierpliwości",w:{BB:2,X:2,Y:0,Z:0},myth:true, gen:'Z'},
     {t:"Potrzebuje wiedzieć, że jej wysiłek ma sens i kierunek",w:{BB:0,X:0,Y:2,Z:2},myth:false},
-    {t:"Nie pasuje do naszej kultury organizacyjnej",w:{BB:1,X:1,Y:0,Z:0},myth:true},
+    {t:"Nie pasuje do naszej kultury organizacyjnej",w:{BB:1,X:1,Y:0,Z:0},myth:true, gen:'Z'},
     {t:"To okazja do rozmowy o jej wartościach i motywacji",w:{BB:0,X:0,Y:1,Z:2},myth:false}
   ]},
   {sec:"Sekcja 1: Przekonania i mity", txt:"Baby Boomer nie używa Slacka i preferuje telefon. Reaguję:", opts:[
     {t:"Dostosowuję się – dzwonię, skoro to dla niego ważne",w:{BB:2,X:1,Y:0,Z:0},myth:false},
-    {t:"Musi się nauczyć nowych narzędzi – nie ma innej opcji",w:{BB:0,X:0,Y:1,Z:2},myth:true},
+    {t:"Musi się nauczyć nowych narzędzi – nie ma innej opcji",w:{BB:0,X:0,Y:1,Z:2},myth:true, gen:'BB'},
     {t:"Rozumiem – wychował się w innym środowisku komunikacyjnym",w:{BB:2,X:2,Y:0,Z:0},myth:false},
-    {t:"Ogranicza efektywność całego zespołu",w:{BB:0,X:0,Y:1,Z:1},myth:true}
+    {t:"Ogranicza efektywność całego zespołu",w:{BB:0,X:0,Y:1,Z:1},myth:true, gen:'BB'}
   ]},
   {sec:"Sekcja 1: Przekonania i mity", txt:"Millennial z 5-letnim stażem mówi, że chce work-life balance i nie zgadza się na nadgodziny. Oceniam to jako:", opts:[
-    {t:"Brak zaangażowania i lojalności wobec firmy",w:{BB:2,X:1,Y:0,Z:0},myth:true},
+    {t:"Brak zaangażowania i lojalności wobec firmy",w:{BB:2,X:1,Y:0,Z:0},myth:true, gen:'Y'},
     {t:"Sygnał wypalenia – powinienem sprawdzić jak się naprawdę czuje",w:{BB:0,X:1,Y:2,Z:1},myth:false},
     {t:"Uzasadnioną potrzebę, którą można uwzględnić w planowaniu",w:{BB:0,X:1,Y:2,Z:2},myth:false},
-    {t:"Cechę pokoleniową – Millenialsi po prostu tacy są",w:{BB:1,X:0,Y:0,Z:0},myth:true}
+    {t:"Cechę pokoleniową – Millenialsi po prostu tacy są",w:{BB:1,X:0,Y:0,Z:0},myth:true, gen:'Y'}
   ]},
   {sec:"Sekcja 1: Przekonania i mity", txt:"Pokolenie X nie angażuje się w inicjatywy integracyjne. Interpretujesz to jako:", opts:[
-    {t:"Typowe – X-y są zamknięte i indywidualistyczne",w:{BB:0,X:0,Y:1,Z:1},myth:true},
+    {t:"Typowe – X-ki są zamknięte i indywidualistyczne",w:{BB:0,X:0,Y:1,Z:1},myth:true, gen:'X'},
     {t:"Sygnał, że te inicjatywy nie odpowiadają ich potrzebom",w:{BB:1,X:2,Y:1,Z:0},myth:false},
     {t:"Może zbyt dużo pracy operacyjnej – nie mają zasobów",w:{BB:1,X:2,Y:0,Z:0},myth:false},
     {t:"Problem z moją komunikacją – powinienem zapytać wprost",w:{BB:0,X:1,Y:2,Z:1},myth:false}
   ]},
   {sec:"Sekcja 1: Przekonania i mity", txt:"Zdanie: \"Każde pokolenie jest inne i trzeba z każdym rozmawiać inaczej\" – reaguję:", opts:[
-    {t:"Przesada – ludzie są ludźmi, niezależnie od wieku",w:{BB:0,X:0,Y:1,Z:0},myth:true},
+    {t:"Przesada – ludzie są ludźmi, niezależnie od wieku",w:{BB:0,X:0,Y:1,Z:0},myth:true, gen:'ALL'},
     {t:"Tak, ale różnice dotyczą wartości i kontekstu, nie natury człowieka",w:{BB:1,X:1,Y:2,Z:2},myth:false},
     {t:"Zgadzam się w 100% i staram się to stosować",w:{BB:1,X:1,Y:2,Z:2},myth:false},
-    {t:"To polityczna poprawność – nie da się wdrożyć w codziennej pracy",w:{BB:0,X:0,Y:0,Z:0},myth:true}
+    {t:"To polityczna poprawność – nie da się wdrożyć w codziennej pracy",w:{BB:0,X:0,Y:0,Z:0},myth:true, gen:'ALL'}
   ]},
   {sec:"Sekcja 2: Świadomość własnych reakcji", txt:"Otrzymujesz mail od Z-etki: \"Nie widzę sensu w tym projekcie. Po co w ogóle to robimy?\" Twoja pierwsza reakcja:", opts:[
     {t:"Irytacja – kto tak pisze do przełożonego?",w:{BB:1,X:0,Y:0,Z:0},myth:false},
@@ -147,7 +153,7 @@ var QS = [
   {sec:"Sekcja 2: Świadomość własnych reakcji", txt:"Pojęcie \"reakcja automatyczna\" w kontekcie komunikacji interpersonalnej:", opts:[
     {t:"Znam i potrafię rozpoznawać moje własne automatyczne reakcje",w:{BB:0,X:1,Y:2,Z:2},myth:false},
     {t:"Słyszałem, ale nie stosuję w codziennej pracy",w:{BB:1,X:1,Y:1,Z:0},myth:false},
-    {t:"To psychologiczny żargon – wolę konkretne narzędzia",w:{BB:2,X:1,Y:0,Z:0},myth:false},
+    {t:"To psychologiczny jargon – wolę konkretne narzędzia",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Rozumiem i aktywnie pracuję nad świadomością reakcji",w:{BB:0,X:1,Y:2,Z:2},myth:false}
   ]},
   {sec:"Sekcja 3: Strategie w praktyce HR", txt:"Rozmowa rekrutacyjna z kandydatem z Gen Z. Jakie pytanie najlepiej zbada jego motywację?", opts:[
@@ -168,7 +174,7 @@ var QS = [
     {t:"Szybkie wrzucenie w projekty – nauczy się w działaniu",w:{BB:0,X:0,Y:1,Z:2},myth:false},
     {t:"Rozmowę o wartościach firmy i jej wpływie społecznym",w:{BB:0,X:0,Y:2,Z:2},myth:false}
   ]},
-  {sec:"Sekcja 3: Strategie w praktyce HR", txt:"Napięcie w zespole: X-y chcą telekonferencji, Z-etki wolą chat. Jako HR reagujesz:", opts:[
+  {sec:"Sekcja 3: Strategie w praktyce HR", txt:"Napięcie w zespole: X-ki chcą telekonferencji, Z-etki wolą chat. Jako HR reagujesz:", opts:[
     {t:"Ustalasz jedno obowiązujące narzędzie dla wszystkich",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Organizujesz rozmowę o potrzebach stojących za preferencjami",w:{BB:0,X:1,Y:2,Z:2},myth:false},
     {t:"Wprowadzasz zasadę: temat decyduje o narzędziu",w:{BB:1,X:2,Y:2,Z:1},myth:false},
@@ -187,9 +193,9 @@ var answers = new Array(15).fill(null);
 function buildQuestions() {
   var html = '';
   QS.forEach(function(q, qi) {
-    html += '<div class="q-card"><div class="q-sec">' + q.sec + '</div><div class="q-num">Pytanie ' + (qi + 1) + ' z 15</div><div class="q-text">' + q.txt + '</div><div class="opts">';
-    ['A','B','C','D'].forEach(function(ltr, oi) {
-      html += '<div class="opt" id="opt-' + qi + '-' + oi + '" onclick="pickAnswer(' + qi + ',' + oi + ')"><input type="radio" name="q' + qi + '" id="r' + qi + 'o' + oi + '"><label for="r' + qi + 'o' + oi + '">' + q.opts[oi].t + '</label></div>';
+    html += '<div class="q-card"><div class="q-text">' + q.txt + '</div><div class="opts">';
+    q.opts.forEach(function(o, oi) {
+      html += `<div class="opt" id="opt-${qi}-${oi}" onclick="pickAnswer(${qi},${oi})"><label>${o.t}</label></div>`;
     });
     html += '</div></div>';
   });
@@ -200,61 +206,106 @@ function pickAnswer(qi, oi) {
   answers[qi] = oi;
   for (var i = 0; i < 4; i++) { var el = document.getElementById('opt-' + qi + '-' + i); if (el) el.classList.remove('sel'); }
   document.getElementById('opt-' + qi + '-' + oi).classList.add('sel');
-  document.getElementById('r' + qi + 'o' + oi).checked = true;
-  var done = answers.filter(function(a) { return a !== null; }).length;
-  document.getElementById('prog-fill').style.width = (done / 15 * 100) + '%';
-  document.getElementById('prog-label').textContent = 'Odpowiedziano: ' + done + ' z 15';
+  var done = answers.filter(a => a !== null).length;
+  document.getElementById('prog-fill').style.width = (done/15*100)+'%';
+  document.getElementById('prog-label').innerText = 'Odpowiedziano: ' + done + ' z 15';
 }
 
 function calcScores(ans) {
-  var sc = {BB:0, X:0, Y:0, Z:0}; 
-  var myths = 0;
-  ans.forEach(function(ai, qi) {
+  var sc = {BB:0, X:0, Y:0, Z:0}; var mythsCount = 0; var stereos = [];
+  ans.forEach((ai, qi) => {
     var opt = QS[qi].opts[ai];
     sc.BB += opt.w.BB; sc.X += opt.w.X; sc.Y += opt.w.Y; sc.Z += opt.w.Z;
-    if (opt.myth) myths++;
+    if (opt.myth) { mythsCount++; stereos.push({txt: opt.t, gen: opt.gen}); }
   });
-  
-  var total = sc.BB + sc.X + sc.Y + sc.Z;
-  // ZMIANA: Dzielnik 75 zamiast 30 sprawia, że 100% jest realnym wyzwaniem
-  var flex = Math.min(100, Math.round(total / 75 * 100));
-  var awareness = Math.max(0, 100 - myths * 15);
-  
-  // Progi dla profili:
+  var flex = Math.min(100, Math.round((sc.BB+sc.X+sc.Y+sc.Z)/75*100));
   var profile = flex >= 75 ? 'Ambasador' : flex >= 45 ? 'Mediator' : 'Odkrywca';
   
-  return { sc:sc, flex:flex, myths:myths, awareness:awareness, profile:profile };
+  // Znajdź najbliższą grupę
+  var maxVal = Math.max(sc.BB, sc.X, sc.Y, sc.Z);
+  var closest = Object.keys(sc).find(key => sc[key] === maxVal);
+  
+  return { sc, flex, mythsCount, stereos, awareness: Math.max(0, 100 - mythsCount * 15), profile, closest };
 }
 
 async function submitTest() {
-  if (answers.includes(null)) { alert("Proszę odpowiedzieć na wszystkie pytania!"); return; }
+  if (answers.includes(null)) { alert("Odpowiedz na wszystkie pytania!"); return; }
   var res = calcScores(answers);
   document.getElementById('quiz-view').style.display = 'none';
   try {
-    await db.ref('wyniki').push({ flex: res.flex, myths: res.myths, BB: res.sc.BB, X: res.sc.X, Y: res.sc.Y, Z: res.sc.Z, ts: Date.now(), profile: res.profile });
-  } catch(e) { console.log("Błąd bazy danych."); }
+    await db.ref('wyniki').push({ flex: res.flex, myths: res.mythsCount, BB: res.sc.BB, X: res.sc.X, Y: res.sc.Y, Z: res.sc.Z, profile: res.profile });
+  } catch(e) {}
   renderIndividual(res);
 }
 
 function renderIndividual(res) {
-  var GC = {BB:'#2D1B4E', X:'#3D2460', Y:'#4A2C8A', Z:'#5B2D8E'};
-  var GN = {BB:'Baby Boomers', X:'Gen X', Y:'Millenialsi', Z:'Gen Z'};
   var PT = {
-    Ambasador: { icon:'🌟', full:'Pokoleniowy Ambasador', desc:'Rozumiesz różnice pokoleniowe jako zasób. Stosujesz różne strategie i rozpoznajesz własne automatyczne reakcje.' },
-    Mediator: { icon:'🔍', full:'Rozwijający się Mediator', desc:'Masz solidne podstawy – rozumiesz różnorodność pokoleniową, ale zdarzają Ci się automatyczne reakcje.' },
-    Odkrywca: { icon:'🚀', full:'Odkrywca Pokoleń', desc:'Masz wiele przekonań pokoleniowych do przepracowania – i to jest normalne! Ten webinar pomoże Ci zobaczyć prawdę.' }
+    Ambasador: { icon:'🌟', full:'Pokoleniowy Ambasador', desc:'Rozumiesz różnice pokoleniowe jako zasób.' },
+    Mediator: { icon:'🔍', full:'Rozwijający się Mediator', desc:'Masz solidne podstawy, pracuj nad automatyzmami.' },
+    Odkrywca: { icon:'🚀', full:'Odkrywca Pokoleń', desc:'Wiele przekonań do przepracowania.' }
   };
   var p = PT[res.profile];
-  var flexBg = res.flex >= 65 ? '#1a6040' : res.flex >= 40 ? '#c27700' : '#8B0000';
-  var mythsHtml = '';
-  answers.forEach(function(ai, qi) { if (QS[qi].opts[ai].myth) mythsHtml += '<div class="myth-item">⚠ ' + QS[qi].opts[ai].t + '</div>'; });
-  if (!mythsHtml) mythsHtml = '<div class="tip-item">✓ Brak aktywnych stereotypów!</div>';
-  var genCells = ['BB','X','Y','Z'].map(function(g) {
-    return '<div class="gc" style="background:' + GC[g] + '22;border:1.5px solid ' + GC[g] + '"><div class="gl" style="color:' + GC[g] + '">' + GN[g] + '</div><div class="gv" style="color:' + GC[g] + '">' + res.sc[g] + '</div></div>';
-  }).join('');
-  document.getElementById('ind-results').innerHTML = '<div class="res-box"><div class="res-head"><div class="res-title">' + p.icon + ' ' + p.full + '</div><div class="res-sub">Twój indywidualny wynik</div></div><div class="res-body"><p style="font-size:13px;line-height:1.6;margin-bottom:18px;">' + p.desc + '</p><div class="score-grid"><div class="sc" style="background:'+flexBg+'22;border:1.5px solid '+flexBg+'"><div class="lbl" style="color:'+flexBg+'">Elastyczność</div><div class="val" style="color:'+flexBg+'">'+res.flex+'%</div></div><div class="sc" style="background:#FDF3D7;border:1.5px solid #D4A843"><div class="lbl" style="color:#c27700">Świadomość</div><div class="val" style="color:#D4A843">'+res.awareness+'%</div></div></div><div class="gen-grid">' + genCells + '</div><hr class="divider"><div class="ph3">Zidentyfikowane stereotypy</div>' + mythsHtml + '<hr class="divider"><div class="cta-box">VIA Multiplier &middot; Szkolenia i Coaching</div></div></div>';
+  
+  // Generowanie wskazówek
+  var tipsHtml = '';
+  res.stereos.forEach(s => {
+    if(s.gen === 'Z') tipsHtml += `<div class="tip-item">💡 <strong>Zetki:</strong> Zamiast oceniać ich przez pryzmat "roszczeniowości", zadbaj o <em>feedback pętlowy</em> i wyjaśnianie sensu zadań (HBR, 2024).</div><div class="tip-item">💡 Zaproponuj <em>Reverse Mentoring</em> - pozwól im uczyć Cię nowinek technologicznych.</div>`;
+    if(s.gen === 'BB') tipsHtml += `<div class="tip-item">💡 <strong>Boomerzy:</strong> Ich opór przed technologią to często brak szkolenia, nie chęci. Poświęć czas na <em>Face-to-Face</em> (Kaplan, 2025).</div><div class="tip-item">💡 Wykorzystaj ich "pamięć instytucjonalną" - oni są strażnikami kultury firmy.</div>`;
+    if(s.gen === 'Y') tipsHtml += `<div class="tip-item">💡 <strong>Millenialsi:</strong> Dla nich elastyczność to priorytet (Deloitte 2024). Buduj zaufanie poprzez <em>zarządzanie przez cele</em>, nie przez kontrolę czasu.</div>`;
+    if(s.gen === 'X') tipsHtml += `<div class="tip-item">💡 <strong>Gen X:</strong> Szanuj ich potrzebę autonomii. Komunikuj się konkretnie, bez "motywacyjnego szumu".</div>`;
+  });
+  if(!tipsHtml) tipsHtml = '<div class="tip-item">✓ Brak zidentyfikowanych barier. Kontynuuj obecną strategię!</div>';
+
+  // Tabela synergii
+  var synergyData = {
+    'BB': 'Najlepsza współpraca z <strong>Gen Z</strong> (Mentor-Uczeń) oraz <strong>Gen X</strong> (Stabilność).',
+    'X': 'Idealny duet z <strong>Millenialsami</strong> - oba pokolenia cenią pragmatyzm.',
+    'Y': 'Synergia z <strong>Gen X</strong> w zadaniach projektowych.',
+    'Z': 'Najwyższa innowacyjność w parze z <strong>Baby Boomers</strong> (doświadczenie + nowe media).'
+  };
+
+  var congrats = (res.flex === 100 && res.mythsCount === 0) ? '<div class="congrats-card">🎉 Gratulacje! Twoja postawa jest wzorem inkluzywności międzypokoleniowej!</div>' : '';
+
+  document.getElementById('ind-results').innerHTML = `
+    <div class="res-box">
+      <div class="res-head"><div class="res-title">${p.icon} ${p.full}</div></div>
+      <div class="res-body">
+        ${congrats}
+        <p style="margin-bottom:15px">${p.desc}</p>
+        <div class="score-grid">
+          <div class="sc" style="border-color:var(--violet)"><div class="lbl">Elastyczność</div><div class="val">${res.flex}%</div></div>
+          <div class="sc" style="border-color:var(--gold)"><div class="lbl">Świadomość</div><div class="val">${res.awareness}%</div></div>
+        </div>
+        <div class="ph3">Twoja dominująca strategia: ${res.closest}</div>
+        <table class="synergy-table">
+          <tr><th>Z kim współpracujesz najlepiej?</th></tr>
+          <tr><td>${synergyData[res.closest]}</td></tr>
+        </table>
+        <div class="ph3">Wskazówki rozwojowe (HBR/Deloitte)</div>
+        ${tipsHtml}
+        <button class="btn btn-pdf" onclick="generatePDF()">Pobierz wynik (PDF) &darr;</button>
+        <div class="cta-box" style="margin-top:20px">VIA | Multiplier &middot; Szkolenia i Coaching</div>
+      </div>
+    </div>`;
   window.scrollTo(0,0);
 }
+
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const element = document.getElementById('pdf-content');
+    
+    html2canvas(element).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps= doc.getImageProperties(imgData);
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        doc.text("VIA | Multiplier, szkolenia i coaching", 10, pdfHeight + 10);
+        doc.save("Wynik_Pokoleniowy_Kompas_VIA.pdf");
+    });
+}
+
 buildQuestions();
 </script>
 </body>
