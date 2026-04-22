@@ -39,7 +39,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 .btn { display: inline-block; padding: 15px 32px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; background: var(--violet); color: #fff; width: 100%; }
 .btn-pdf { background: #1a6040; margin-top: 25px; }
 
-/* Styl wynikowy */
 .res-box { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-top: 25px; }
 .res-head { background: var(--plum); padding: 25px; color: white; }
 .score-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 15px; margin: 20px 0; }
@@ -48,8 +47,8 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 
 .ph3 { font-size: 15px; font-weight: 700; color: var(--plum); margin: 20px 0 10px; border-bottom: 2px solid var(--gold); padding-bottom: 5px; }
 .tip-box { background: var(--lightpur); border-left: 5px solid var(--violet); padding: 15px; margin-bottom: 15px; border-radius: 0 8px 8px 0; }
-.tip-box p { font-size: 13.5px; line-height: 1.6; color: #333; margin-bottom: 10px; }
-.tip-example { font-style: italic; color: #555; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px; display: block; margin-top: 5px; border-left: 2px solid var(--gold); }
+.tip-box p { font-size: 13.5px; line-height: 1.6; color: #333; margin-bottom: 8px; }
+.tip-example { font-style: italic; color: #444; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 4px; display: block; margin-top: 8px; border-left: 3px solid var(--gold); font-size: 13px; }
 
 .synergy-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
 .synergy-table th { background: #f2f2f2; border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; }
@@ -68,17 +67,17 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
   <div id="quiz-view">
     <div class="hdr">
       <h1>Pokoleniowy Kompas HR</h1>
-      <div class="sub">Personalizowana analiza Twojej komunikacji</div>
+      <div class="sub">Personalizowana analiza strategii komunikacyjnych</div>
     </div>
     <div class="gold-bar"></div>
 
     <div class="intro-box">
       <h3>Jak korzystać z testu?</h3>
-      <p>Odpowiedz szczerze – nie ma złych ani dobrych odpowiedzi. Test mierzy Twoje <strong>naturalne strategie</strong> i <strong>przekonania</strong> w kontakcie z różnymi pokoleniami. Na końcu otrzymasz raport z konkretnymi scenariuszami działań.</p>
+      <p>Odpowiedz szczerze – nie ma złych ani dobrych odpowiedzi. Test mierzy Twoje <strong>naturalne strategie</strong> i <strong>przekonania</strong> w kontakcie z różnymi pokoleniami. Na końcu otrzymasz unikalny raport z praktycznymi scenariuszami.</p>
     </div>
 
     <div id="q-container"></div>
-    <button class="btn" id="submit-btn" onclick="submitTest()">Generuj raport i wskazówki &rarr;</button>
+    <button class="btn" id="submit-btn" onclick="submitTest()">Generuj mój profil i wskazówki &rarr;</button>
   </div>
   
   <div id="ind-results"></div>
@@ -91,6 +90,30 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--cream);
 const firebaseConfig = { databaseURL: "https://kompas-hr-default-rtdb.europe-west1.firebasedatabase.app" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+// BANK PRZYKŁADÓW (Dla Marcina: Tutaj możesz dopisywać nowe!)
+const TIPS_BANK = {
+  Z: [
+    { wyzwanie: "Roszczeniowość vs Głód wpływu", przyklad: "Zamiast: 'Poczekaj na swoją kolej', powiedz: 'Doceniam Twój pęd. Jakie 2 kompetencje chcesz rozwinąć w tym kwartale, by przygotować się do wyższej roli?'" },
+    { wyzwanie: "Feedback pętlowy", przyklad: "Zetki potrzebują wiedzieć 'jak mi idzie' częściej niż raz na kwartał. Spróbuj: 'Dobra robota z tym raportem, szczególnie te wykresy. Następnym razem dodaj tylko krótkie podsumowanie na wstępie'." },
+    { wyzwanie: "Praca zdalna vs Relacje", przyklad: "Zamiast narzucać biuro, zapytaj: 'Jakiej formy kontaktu potrzebujesz, by czuć wsparcie zespołu, pracując z domu?'" }
+  ],
+  BB: [
+    { wyzwanie: "Relacja przed zadaniem", przyklad: "Zanim przejdziesz do liczb, poświęć 2 minuty na small-talk. Powiedz: 'Dzień dobry, jak minął weekend? Słyszałem, że zajmuje się Pan ogrodnictwem...'" },
+    { wyzwanie: "Szacunek dla doświadczenia", przyklad: "Zamiast narzucać nową aplikację, powiedz: 'Pańska wiedza o tym kliencie jest bezcenna. Chcę wdrożyć to narzędzie, by pomogło nam szybciej wyciągać te dane, które Pan od lat analizuje'." },
+    { wyzwanie: "Komunikacja bezpośrednia", przyklad: "Jeśli sprawa jest pilna, nie pisz maila. Podejdź lub zadzwoń. Boomerzy cenią 'głos' bardziej niż 'tekst'." }
+  ],
+  Y: [
+    { wyzwanie: "Zarządzanie przez sens (Purpose)", przyklad: "Zamiast: 'Zrób to na jutro', powiedz: 'Ten projekt pomoże nam zredukować błędy o 20%, co przełoży się na mniejszy stres w zespole. Twoja część jest kluczowa'." },
+    { wyzwanie: "Elastyczność jako waluta", przyklad: "Gdy proszą o wyjście wcześniej, powiedz: 'Jasne, ufam Ci. Ustalmy tylko, kiedy dowieziesz tę prezentację, by reszta zespołu mogła ruszyć dalej'." },
+    { wyzwanie: "Rozwój przez coaching", przyklad: "Zamiast dawać gotowe rady, zapytaj: 'Jak Ty byś to rozwiązał, mając te zasoby? Chcę usłyszeć Twój punkt widzenia'." }
+  ],
+  X: [
+    { wyzwanie: "Samodzielność i Autonomia", przyklad: "X-y nie znoszą mikrozarządzania. Powiedz: 'Oto cel i budżet. Znasz się na tym najlepiej. Daj znać, jeśli napotkasz blokady, których nie możesz przeskoczyć'." },
+    { wyzwanie: "Konkret vs Korpomowa", przyklad: "Mów krótko. Zamiast 'Synergia międzydziałowa w aspekcie holistycznym', powiedz: 'Potrzebujemy, by IT dogadało się z marketingiem w sprawie baz danych'." },
+    { wyzwanie: "Docenienie pragmatyzmu", przyklad: "Pokaż, że cenisz ich spokój w kryzysie: 'Doceniam, jak opanowałeś tę sytuację. Twoje doświadczenie z kryzysu 2008 roku naprawdę się tu przydało'." }
+  ]
+};
 
 var QS = [
   {sec:"Przekonania", txt:"Kiedy Z-etka pyta po tygodniu pracy o awans, myślę przede wszystkim:", opts:[
@@ -131,27 +154,27 @@ var QS = [
   ]},
   {sec:"Świadomość", txt:"Podczas spotkania online Baby Boomer przerywa co chwilę i mówi długimi zdaniami. Zauważam w sobie:", opts:[
     {t:"Niecierpliwość – to nieefektywne",w:{BB:0,X:0,Y:1,Z:2},myth:false},
-    {t:"Szacunek – ma doświadczenie i warto go słuchać",w:{BB:2,X:1,Y:0,Z:0},myth:false},
+    {t:"Szacunek – ma doświadczenie i warto go s\u0142ucha\u0107",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Chęć przerwania i skrócenia rozmowy",w:{BB:0,X:0,Y:1,Z:2},myth:false},
-    {t:"Potrafię zarządzać emocjami i aktywnie słucham",w:{BB:1,X:1,Y:1,Z:1},myth:false}
+    {t:"Potrafi\u0119 zarz\u0105dza\u0107 emocjami i aktywnie s\u0142ucham",w:{BB:1,X:1,Y:1,Z:1},myth:false}
   ]},
-  {sec:"Świadomość", txt:"Zanim wyślesz ważny komunikat do zespołu, zatrzymujesz się i pytasz siebie:", opts:[
+  {sec:"Świadomość", txt:"Zanim wy\u015blesz wa\u017cny komunikat do zespołu, zatrzymujesz si\u0119 i pytasz siebie:", opts:[
     {t:"Czy to jest jasne i zwięzłe?",w:{BB:1,X:2,Y:1,Z:1},myth:false},
-    {t:"Jak różne osoby mogą odebrać te słowa?",w:{BB:1,X:1,Y:2,Z:2},myth:false},
-    {t:"Zazwyczaj po prostu wysyłam – nie analizuję",w:{BB:0,X:0,Y:0,Z:0},myth:false},
+    {t:"Jak różne osoby mogą odebrać te s\u0142owa?",w:{BB:1,X:1,Y:2,Z:2},myth:false},
+    {t:"Zazwyczaj po prostu wysyłam – nie analizuj\u0119",w:{BB:0,X:0,Y:0,Z:0},myth:false},
     {t:"Czy uwzględniam język i styl każdego odbiorcy?",w:{BB:1,X:1,Y:2,Z:2},myth:false}
   ]},
   {sec:"Świadomość", txt:"Twój komunikat wywołał nieoczekiwaną złość u kogoś z innego pokolenia. Reagujesz:", opts:[
-    {t:"Tłumaczę, że zostałem źle zrozumiany",w:{BB:1,X:1,Y:0,Z:0},myth:false},
-    {t:"Pytam, co w moim komunikacie tak zadziałało",w:{BB:0,X:1,Y:2,Z:2},myth:false},
-    {t:"Staram się naprawić relację, przepraszam",w:{BB:0,X:0,Y:2,Z:1},myth:false},
-    {t:"Analizuję, jak następnym razem sformułować inaczej",w:{BB:0,X:1,Y:2,Z:2},myth:false}
+    {t:"T\u0142umacz\u0119, \u017ce zosta\u0142em \u017ale zrozumiany",w:{BB:1,X:1,Y:0,Z:0},myth:false},
+    {t:"Pytam, co w moim komunikacie tak zadzia\u0142a\u0142o",w:{BB:0,X:1,Y:2,Z:2},myth:false},
+    {t:"Staram si\u0119 naprawi\u0107 relacj\u0119, przepraszam",w:{BB:0,X:0,Y:2,Z:1},myth:false},
+    {t:"Analizuj\u0119, jak nast\u0119pnym razem sformu\u0142owa\u0107 inaczej",w:{BB:0,X:1,Y:2,Z:2},myth:false}
   ]},
   {sec:"Świadomość", txt:"Pojęcie \"reakcja automatyczna\" w komunikacji interpersonalnej:", opts:[
     {t:"Znam i potrafię rozpoznawać moje własne automatyczne reakcje",w:{BB:0,X:1,Y:2,Z:2},myth:false},
-    {t:"Słyszałem, ale nie stosuję w codziennej pracy",w:{BB:1,X:1,Y:1,Z:0},myth:false},
+    {t:"S\u0142ysza\u0142em, ale nie stosuj\u0119 w codziennej pracy",w:{BB:1,X:1,Y:1,Z:0},myth:false},
     {t:"To psychologiczny żargon – wolę konkretne narzędzia",w:{BB:2,X:1,Y:0,Z:0},myth:false},
-    {t:"Rozumiem i aktywnie pracuję nad świadomością reakcji",w:{BB:0,X:1,Y:2,Z:2},myth:false}
+    {t:"Rozumiem i aktywnie pracuj\u0119 nad świadomością reakcji",w:{BB:0,X:1,Y:2,Z:2},myth:false}
   ]},
   {sec:"Strategie", txt:"Rozmowa rekrutacyjna z kandydatem z Gen Z. Jakie pytanie najlepiej zbada jego motywację?", opts:[
     {t:"Dlaczego chce Pan/Pani pracować w naszej firmie?",w:{BB:2,X:1,Y:0,Z:0},myth:false},
@@ -181,4 +204,128 @@ var QS = [
     {t:"Jeden format dla wszystkich – równość i spójność",w:{BB:2,X:1,Y:0,Z:0},myth:false},
     {t:"Nagranie dostępne on-demand – każdy kiedy chce",w:{BB:0,X:1,Y:1,Z:2},myth:false},
     {t:"Mix: live + nagranie + materiały do pracy",w:{BB:1,X:2,Y:2,Z:2},myth:false},
-    {t:"Warsztaty z prawdziwymi sytuacjami z firmowej codzienności",w:{BB:1,X:2,Y:2,Z:1},
+    {t:"Warsztaty z prawdziwymi sytuacjami z firmowej codzienności",w:{BB:1,X:2,Y:2,Z:1},myth:false}
+  ]}
+];
+
+var answers = new Array(15).fill(null);
+
+function buildQuestions() {
+  var html = '';
+  QS.forEach(function(q, qi) {
+    html += '<div class="q-card"><div class="q-text">' + q.txt + '</div><div class="opts">';
+    q.opts.forEach(function(o, oi) {
+      html += `<div class="opt" id="opt-${qi}-${oi}" onclick="pickAnswer(${qi},${oi})"><label>${o.t}</label></div>`;
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('q-container').innerHTML = html;
+}
+
+function pickAnswer(qi, oi) {
+  answers[qi] = oi;
+  for (var i = 0; i < 4; i++) { var el = document.getElementById('opt-' + qi + '-' + i); if (el) el.classList.remove('sel'); }
+  document.getElementById('opt-' + qi + '-' + oi).classList.add('sel');
+  var done = answers.filter(a => a !== null).length;
+  document.getElementById('prog-fill').style.width = (done/15*100)+'%';
+}
+
+function calcScores(ans) {
+  var sc = {BB:0, X:0, Y:0, Z:0}; var mythsCount = 0; var stereos = [];
+  ans.forEach((ai, qi) => {
+    var opt = QS[qi].opts[ai];
+    sc.BB += opt.w.BB; sc.X += opt.w.X; sc.Y += opt.w.Y; sc.Z += opt.w.Z;
+    if (opt.myth) { mythsCount++; stereos.push({txt: opt.t, gen: opt.gen}); }
+  });
+  var flex = Math.min(100, Math.round((sc.BB+sc.X+sc.Y+sc.Z)/75*100));
+  var profile = flex >= 75 ? 'Ambasador' : flex >= 45 ? 'Mediator' : 'Odkrywca';
+  var maxVal = Math.max(sc.BB, sc.X, sc.Y, sc.Z);
+  var closest = Object.keys(sc).find(key => sc[key] === maxVal);
+  return { sc, flex, mythsCount, stereos, awareness: Math.max(0, 100 - mythsCount * 15), profile, closest };
+}
+
+async function submitTest() {
+  if (answers.includes(null)) { alert("Uzupełnij wszystkie odpowiedzi!"); return; }
+  var res = calcScores(answers);
+  document.getElementById('quiz-view').style.display = 'none';
+  try {
+    await db.ref('wyniki').push({ flex: res.flex, myths: res.mythsCount, BB: res.sc.BB, X: res.sc.X, Y: res.sc.Y, Z: res.sc.Z, profile: res.profile });
+  } catch(e) {}
+  renderIndividual(res);
+}
+
+function renderIndividual(res) {
+  var PT = {
+    Ambasador: { icon:'🌟', full:'Pokoleniowy Ambasador', desc:'Twoje podejście promuje synergię. Rozumiesz rzadką sztukę adaptacji stylu komunikacji bez tracenia autentyczności.' },
+    Mediator: { icon:'🔍', full:'Rozwijający się Mediator', desc:'Masz solidne fundamenty, ale wciąż działasz na pewnych automatyzmach.' },
+    Odkrywca: { icon:'🚀', full:'Odkrywca Pokoleń', desc:'Dopiero zaczynasz dostrzegać głębię różnic. To świetny punkt startowy.' }
+  };
+  var p = PT[res.profile];
+  
+  // LOGIKA LOSOWANIA WSKAZÓWEK (Dla Marcina: Losuje 1 zestaw z banku dla każdego błędu)
+  var tipsHtml = '';
+  var usedGens = [];
+
+  res.stereos.forEach(s => {
+    if(!usedGens.includes(s.gen) && TIPS_BANK[s.gen]) {
+        var bank = TIPS_BANK[s.gen];
+        var randomTip = bank[Math.floor(Math.random() * bank.length)]; // Magia losowania
+        tipsHtml += `<div class="tip-box"><p><strong>Wyzwanie: ${randomTip.wyzwanie}</strong></p>
+        <span class="tip-example">PRZYKŁAD: ${randomTip.przyklad}</span></div>`;
+        usedGens.push(s.gen);
+    }
+  });
+
+  if(!tipsHtml) tipsHtml = '<div class="tip-box">✓ Twoje odpowiedzi wskazują na wysoką elastyczność i brak aktywnych uprzedzeń. Kontynuuj budowanie kultury Multipliera!</div>';
+
+  var synergyTable = `
+    <table class="synergy-table">
+      <tr><th>Kto z kim współpracuje najlepiej?</th><th>Dlaczego to działa?</th></tr>
+      <tr><td><strong>Zetki + Boomerzy</strong></td><td>To duet marzeń w mentoringu odwróconym. Zetki dają technologię, Boomerzy dają spokój i kontakty.</td></tr>
+      <tr><td><strong>Gen X + Millenialsi</strong></td><td>Oba pokolenia cenią konkret. X-y dają "jak to zrobić", a Y-ki dają "zróbmy to mądrzej".</td></tr>
+    </table>`;
+
+  var congrats = (res.flex === 100 && res.mythsCount === 0) ? '<div class="congrats-card">🎉 Gratulacje! Twoja postawa jest wzorem inkluzywności międzypokoleniowej!</div>' : '';
+
+  document.getElementById('ind-results').innerHTML = `
+    <div class="res-box">
+      <div class="res-head"><div class="res-title">${p.icon} ${p.full}</div></div>
+      <div class="res-body">
+        ${congrats}
+        <div class="score-grid">
+          <div class="sc" style="border-color:var(--violet)"><div class="lbl">Elastyczność</div><div class="val">${res.flex}%</div></div>
+          <div class="sc" style="border-color:var(--gold)"><div class="lbl">Świadomość</div><div class="val">${res.awareness}%</div></div>
+        </div>
+        <div class="ph3">Twoja dominująca strategia: ${res.closest}</div>
+        ${synergyTable}
+        <div class="ph3">Praktyczne wskazówki rozwojowe</div>
+        ${tipsHtml}
+        <button class="btn btn-pdf" id="pdf-btn" onclick="generatePDF()">Pobierz raport PDF &darr;</button>
+      </div>
+    </div>`;
+  window.scrollTo(0,0);
+}
+
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const header = document.getElementById('pdf-header');
+    const btn = document.getElementById('pdf-btn');
+
+    header.style.display = 'block'; 
+    if(btn) btn.style.display = 'none'; 
+
+    html2canvas(document.getElementById('pdf-area'), {scale: 2}).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210; 
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        doc.save("Raport_VIA_Multiplier.pdf");
+        header.style.display = 'none'; 
+        if(btn) btn.style.display = 'block'; 
+    });
+}
+buildQuestions();
+</script>
+</body>
+</html>
